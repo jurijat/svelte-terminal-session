@@ -16,12 +16,11 @@ export default defineConfig({
       fileName: (format) => `terminal-session.${format}.js`,
     },
     rollupOptions: {
-      // Ensure external dependencies are not bundled
-      external: ['svelte'],
+      // Bundle everything for standalone web component
+      // Note: For NPM publishing, you might want svelte as external
+      // but for GitHub Pages demo, we need it bundled
       output: {
-        globals: {
-          svelte: 'Svelte'
-        }
+        // No globals needed when everything is bundled
       }
     }
   },
