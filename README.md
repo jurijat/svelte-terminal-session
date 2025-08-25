@@ -204,6 +204,129 @@ interface ColorScheme {
 }
 ```
 
+## Framework Integration
+
+### React/Next.js
+See [DOCUSAURUS_INTEGRATION.md](./DOCUSAURUS_INTEGRATION.md) for detailed React integration guide.
+
+### Vue.js
+```javascript
+// In your Vue component
+import 'svelte-terminal-session';
+
+export default {
+  mounted() {
+    this.$refs.terminal.session = [
+      { type: 'command', content: 'vue --version' },
+      { type: 'output', content: '@vue/cli 5.0.8' }
+    ];
+  }
+}
+```
+
+### Angular
+```typescript
+// In your Angular component
+import 'svelte-terminal-session';
+
+export class MyComponent implements AfterViewInit {
+  @ViewChild('terminal', { static: false }) terminal!: ElementRef;
+  
+  ngAfterViewInit() {
+    this.terminal.nativeElement.session = [
+      { type: 'command', content: 'ng version' },
+      { type: 'success', content: 'Angular CLI: 15.2.4' }
+    ];
+  }
+}
+```
+
+## Examples
+
+### Git Workflow Demo
+```html
+<terminal-session 
+  id="git-demo"
+  theme="dark" 
+  autoplay="true"
+  enable-typing="true"
+  title="Git Workflow"
+></terminal-session>
+
+<script>
+document.getElementById('git-demo').session = [
+  { type: 'command', content: 'git status', delay: 500 },
+  { type: 'output', content: 'On branch main\nYour branch is up to date with origin/main.' },
+  { type: 'command', content: 'git add .', delay: 1000 },
+  { type: 'command', content: 'git commit -m "Add new feature"', delay: 500 },
+  { type: 'success', content: '[main abc1234] Add new feature\n 3 files changed, 45 insertions(+)' },
+  { type: 'command', content: 'git push origin main', delay: 800 },
+  { type: 'success', content: '✓ Successfully pushed to origin/main' }
+];
+</script>
+```
+
+### Error Handling Example
+```html
+<terminal-session id="error-demo" theme="dark"></terminal-session>
+
+<script>
+document.getElementById('error-demo').session = [
+  { type: 'command', content: 'npm run build' },
+  { type: 'output', content: 'Building application...' },
+  { type: 'error', content: 'ERROR: Module not found: Cannot resolve ./missing-file.js' },
+  { type: 'warning', content: 'Build failed with 1 error' },
+  { type: 'command', content: 'npm run fix', delay: 2000 },
+  { type: 'success', content: '✓ All issues resolved!' }
+];
+</script>
+```
+
+### Development Workflow with Tabs
+```html
+<terminal-session 
+  id="dev-workflow"
+  show-tabs="true"
+  allow-tab-close="true"
+></terminal-session>
+
+<script>
+const terminal = document.getElementById('dev-workflow');
+terminal.tabs = [
+  {
+    id: 'install',
+    title: '📦 Install',
+    session: [
+      { type: 'command', content: 'npm install' },
+      { type: 'output', content: 'added 234 packages in 12s' },
+      { type: 'success', content: '✓ Dependencies installed' }
+    ]
+  },
+  {
+    id: 'dev',
+    title: '🚀 Dev Server', 
+    badge: 'running',
+    status: 'running',
+    session: [
+      { type: 'command', content: 'npm run dev' },
+      { type: 'info', content: 'Local:   http://localhost:3000' },
+      { type: 'info', content: 'Network: http://192.168.1.100:3000' },
+      { type: 'success', content: '✓ Development server started' }
+    ]
+  },
+  {
+    id: 'test',
+    title: '🧪 Tests',
+    session: [
+      { type: 'command', content: 'npm test' },
+      { type: 'output', content: 'Running tests...' },
+      { type: 'success', content: '✓ All tests passed (23 tests)' }
+    ]
+  }
+];
+</script>
+```
+
 ## Development
 
 ```bash
@@ -220,6 +343,14 @@ npm run build
 npm run check
 ```
 
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`) 
+5. Open a Pull Request
+
 ## License
 
-MIT
+MIT - see [LICENSE](./LICENSE) for details.
