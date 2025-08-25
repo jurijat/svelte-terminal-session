@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal Session - Performance Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #1a1a1a;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: white;
+      text-align: center;
+    }
+    terminal-session {
+      height: 500px;
+      margin: 20px 0;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #667eea;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #5a64d8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Terminal Session - Performance Test</h1>
+    
+    <div class="controls">
+      <button onclick="playDemo()">Play Demo</button>
+      <button onclick="resetDemo()">Reset</button>
+      <button onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+
+    <terminal-session id="terminal" theme="dark" show-header="true" title="Typing Effect Demo" typing-speed="60"></terminal-session>
+  </div>
+
+  <script type="module">
+    import './src/lib/Terminal.svelte';
+
+    const terminal = document.getElementById('terminal');
+    
+    // Create a session with proper delays and typing effects
+    const testSession = [
+      { type: 'info', content: 'Welcome to the typing effect demo!', delay: 300 },
+      { type: 'command', content: 'npm run build', delay: 500 },
+      { type: 'output', content: '> project@1.0.0 build\n> vite build', delay: 400 },
+      { type: 'info', content: 'vite v5.0.0 building for production...', delay: 600 },
+      { type: 'output', content: 'transforming...', delay: 800 },
+      { type: 'success', content: '✓ 99 modules transformed.', delay: 500 },
+      { type: 'output', content: 'rendering chunks...', delay: 400 },
+      { type: 'output', content: 'computing gzip size...', delay: 600 },
+      { type: 'success', content: 'dist/index.html        0.45 kB\ndist/assets/index.css  1.23 kB │ gzip: 0.62 kB\ndist/assets/index.js   67.21 kB │ gzip: 20.14 kB', delay: 700 },
+      { type: 'success', content: '✓ built in 2.38s', delay: 400 },
+      { type: 'command', content: 'git add -A && git commit -m "Add typing effect to terminal component"', delay: 1000, typingSpeed: 80 },
+      { type: 'output', content: '[main abc1234] Add typing effect to terminal component', delay: 500 },
+      { type: 'success', content: ' 3 files changed, 142 insertions(+), 28 deletions(-)', delay: 400 },
+      { type: 'command', content: 'npm test', delay: 800 },
+      { type: 'output', content: '> project@1.0.0 test\n> vitest', delay: 500 },
+      { type: 'success', content: 'PASS  src/components/Terminal.test.js', delay: 600 },
+      { type: 'success', content: '  ✓ Terminal (3)\n    ✓ should render without errors (15ms)\n    ✓ should handle theme changes (8ms)\n    ✓ should play session correctly (22ms)', delay: 800 },
+      { type: 'output', content: '\nTest Suites: 1 passed, 1 total\nTests:       3 passed, 3 total\nSnapshots:   0 total\nTime:        1.245s', delay: 500 },
+      { type: 'success', content: 'All tests passed!', delay: 400 },
+      { type: 'command', content: 'echo "Click anywhere to skip typing animation!"', delay: 1000, typingSpeed: 40 }
+    ];
+    
+    terminal.session = testSession;
+    
+    window.playDemo = function() {
+      terminal.autoplay = true;
+    };
+    
+    window.resetDemo = function() {
+      terminal.autoplay = false;
+      // Force reset by reassigning session
+      terminal.session = [...testSession];
+    };
+    
+    window.toggleTheme = function() {
+      terminal.theme = terminal.theme === 'dark' ? 'light' : 'dark';
+    };
+    
+    // Listen for theme change events from the component
+    terminal.addEventListener('theme-change', (e) => {
+      terminal.theme = e.detail;
+    });
+    
+    console.log('Terminal component loaded. Click "Play Demo" to start the animation.');
+  </script>
+</body>
+</html>
