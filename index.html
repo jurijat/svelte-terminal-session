@@ -332,7 +332,33 @@
   </div>
 
   <script type="module">
-    import './dist/terminal-session.es.js';
+    // Debug information for GitHub Pages deployment
+    console.log('🔍 Debug Info:');
+    console.log('Current URL:', window.location.href);
+    console.log('Base URL:', window.location.origin + window.location.pathname);
+    
+    // Try ES module first, fallback to UMD if it fails
+    try {
+      console.log('📦 Attempting to load ES module...');
+      await import('./dist/terminal-session.es.js');
+      console.log('✅ ES module loaded successfully');
+    } catch (error) {
+      console.warn('⚠️ ES module failed, loading UMD fallback:', error.message);
+      
+      // Fallback to UMD version
+      console.log('📦 Attempting to load UMD module...');
+      const script = document.createElement('script');
+      script.src = './dist/terminal-session.umd.js';
+      script.onload = () => {
+        console.log('✅ UMD module loaded successfully');
+        console.log('Available globals:', Object.keys(window).filter(key => key.includes('Terminal')));
+      };
+      script.onerror = (err) => {
+        console.error('❌ UMD module also failed to load:', err);
+        console.log('🔧 Please check if dist/terminal-session.umd.js exists and is accessible');
+      };
+      document.head.appendChild(script);
+    }
 
     // Basic terminal session
     const basicSession = [

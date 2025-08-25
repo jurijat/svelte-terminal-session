@@ -15,5 +15,14 @@ export default defineConfig({
       name: 'TerminalSession',
       fileName: (format) => `terminal-session.${format}.js`,
     },
+    rollupOptions: {
+      // Ensure external dependencies are not bundled
+      external: ['svelte'],
+      output: {
+        globals: {
+          svelte: 'Svelte'
+        }
+      }
+    }
   },
 });

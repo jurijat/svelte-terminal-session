@@ -1,0 +1,44 @@
+# GitHub Pages Jekyll configuration for svelte-terminal-session
+title: Svelte Terminal Session
+description: A powerful, themeable terminal session recorder/player web component built with Svelte 5
+author: Juri Jatschmenow
+email: juri.jatschmenow@raiok.com
+
+# Ensure the dist folder and JavaScript files are included
+include:
+  - dist
+  - "*.js"
+  - "*.mjs"
+
+# Disable Jekyll processing for certain file types
+plugins: []
+
+# Prevent Jekyll from processing these files
+exclude:
+  - node_modules
+  - src
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - tsconfig.node.json
+  - vite.config.js
+  - .npmignore
+
+# Enable GitHub Pages
+repository: jurijat/svelte-terminal-session
+github:
+  repository_nwo: jurijat/svelte-terminal-session
+  
+# Base settings
+baseurl: "/svelte-terminal-session"
+url: "https://jurijat.github.io"
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+# Serve settings for local development
+host: 0.0.0.0
+port: 4000

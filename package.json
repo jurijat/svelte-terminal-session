@@ -1,12 +1,59 @@
 {
   "name": "svelte-terminal-session",
   "version": "1.0.0",
+  "description": "A powerful, themeable terminal session recorder/player web component built with Svelte 5",
   "type": "module",
+  "main": "./dist/terminal-session.umd.js",
+  "module": "./dist/terminal-session.es.js",
+  "types": "./dist/terminal-session.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/terminal-session.d.ts",
+      "import": "./dist/terminal-session.es.js",
+      "require": "./dist/terminal-session.umd.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "DOCUSAURUS_INTEGRATION.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "terminal",
+    "session",
+    "recorder",
+    "player",
+    "web-component",
+    "svelte",
+    "typescript",
+    "cli",
+    "demo",
+    "documentation",
+    "tutorial",
+    "typing-animation",
+    "tabs",
+    "theme",
+    "react",
+    "vue",
+    "angular"
+  ],
+  "author": "Juri Jatschmenow <juri.jatschmenow@raiok.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jurijat/svelte-terminal-session.git"
+  },
+  "homepage": "https://github.com/jurijat/svelte-terminal-session#readme",
+  "bugs": {
+    "url": "https://github.com/jurijat/svelte-terminal-session/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
@@ -17,5 +64,8 @@
     "typescript": "^5.0.0",
     "vite": "^5.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  }
 }
