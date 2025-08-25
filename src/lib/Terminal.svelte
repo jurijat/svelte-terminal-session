@@ -95,37 +95,31 @@
     currentTab ? currentTab.title : title
   );
   
+  // Lifecycle: Handle component mount
+  // Manual attribute parsing state
+  let parsedShowHeader = $state(true);
+  let parsedShowPlayButton = $state(true);
+  let parsedShowResetButton = $state(true);
+  let parsedShowThemeToggle = $state(true);
+  let parsedShowWindowButtons = $state(true);
+
   // Computed button visibility (handle both boolean false and string "false")
-  let showPlayButtonComputed = $derived(
-    showPlayButton === false || (showPlayButton as any) === 'false' ? false : true
-  );
+  let showPlayButtonComputed = $derived(parsedShowPlayButton);
   
-  let showResetButtonComputed = $derived(
-    showResetButton === false || (showResetButton as any) === 'false' ? false : true
-  );
+  let showResetButtonComputed = $derived(parsedShowResetButton);
   
-  let showThemeToggleComputed = $derived(
-    showThemeToggle === false || (showThemeToggle as any) === 'false' ? false : true
-  );
+  let showThemeToggleComputed = $derived(parsedShowThemeToggle);
   
-  let showWindowButtonsComputed = $derived(
-    showWindowButtons === false || (showWindowButtons as any) === 'false' ? false : true
-  );
+  let showWindowButtonsComputed = $derived(parsedShowWindowButtons);
   
   // Check if any control buttons should be shown
   let hasControlButtons = $derived(
     showPlayButtonComputed || showResetButtonComputed || showThemeToggleComputed
   );
   
-  // Debug log the showHeader value
-  $effect(() => {
-    console.log('showHeader value:', showHeader, 'type:', typeof showHeader);
-  });
   
-  // Computed header visibility (handle both boolean false and string "false")
-  let showHeaderComputed = $derived(
-    showHeader !== false && (showHeader as any) !== 'false' && (showHeader as any) !== "false"
-  );
+  // Use manually parsed header visibility
+  let showHeaderComputed = $derived(parsedShowHeader);
   
   // Playback state - These are the ONLY stateful variables
   let currentStepIndex = $state(0);
@@ -361,8 +355,108 @@
     }
   }
 
-  // Lifecycle: Handle component mount
+  
   onMount(() => {
+    // Manual attribute parsing - try multiple methods to access the host custom element
+    if (terminalElement) {
+      const elementId = 'terminal-' + Math.random().toString(36).substr(2, 9);
+      
+      // Try multiple methods to find the host element
+      let hostElement = null;
+      let method = 'none';
+      
+      // Method 1: closest() - standard approach
+      const closestElement = terminalElement.closest('terminal-session');
+      if (closestElement) {
+        hostElement = closestElement;
+        method = 'closest()';
+      }
+      
+      // Method 2: parentElement traversal
+      let current = terminalElement.parentElement;
+      while (current && !hostElement) {
+        if (current.tagName?.toLowerCase() === 'terminal-session') {
+          hostElement = current;
+          method = 'parentElement traversal';
+          break;
+        }
+        current = current.parentElement;
+      }
+      
+      // Method 3: getRootNode() approach
+      if (!hostElement) {
+        const root = terminalElement.getRootNode();
+        if (root && root.host && root.host.tagName?.toLowerCase() === 'terminal-session') {
+          hostElement = root.host;
+          method = 'getRootNode().host';
+        }
+      }
+      
+      // Method 4: Direct document query (fallback)
+      if (!hostElement) {
+        const allTerminals = document.querySelectorAll('terminal-session');
+        for (const terminal of allTerminals) {
+          if (terminal.contains(terminalElement)) {
+            hostElement = terminal;
+            method = 'document.querySelectorAll + contains()';
+            break;
+          }
+        }
+      }
+      
+      // Comprehensive DOM debugging
+      console.log(`[${elementId}] DOM Structure Analysis:`);
+      console.log(`[${elementId}] Inner element:`, terminalElement.tagName, terminalElement.className);
+      console.log(`[${elementId}] Parent chain:`, getParentChain(terminalElement));
+      console.log(`[${elementId}] Root node:`, terminalElement.getRootNode()?.constructor?.name);
+      console.log(`[${elementId}] Host found via:`, method);
+      console.log(`[${elementId}] Host element:`, hostElement?.tagName, hostElement?.id);
+      
+      if (hostElement) {
+        // Parse attributes from the host element
+        const showHeaderAttr = hostElement.getAttribute('show-header');
+        parsedShowHeader = showHeaderAttr === 'false' ? false : (showHeader ?? true);
+        
+        const showPlayButtonAttr = hostElement.getAttribute('show-play-button');
+        parsedShowPlayButton = showPlayButtonAttr === 'false' ? false : (showPlayButton ?? true);
+        
+        const showResetButtonAttr = hostElement.getAttribute('show-reset-button');
+        parsedShowResetButton = showResetButtonAttr === 'false' ? false : (showResetButton ?? true);
+        
+        const showThemeToggleAttr = hostElement.getAttribute('show-theme-toggle');
+        parsedShowThemeToggle = showThemeToggleAttr === 'false' ? false : (showThemeToggle ?? true);
+        
+        const showWindowButtonsAttr = hostElement.getAttribute('show-window-buttons');
+        parsedShowWindowButtons = showWindowButtonsAttr === 'false' ? false : (showWindowButtons ?? true);
+        
+        // Success logging
+        console.log(`[${elementId}] ✅ ATTRIBUTES FOUND:`);
+        console.log(`[${elementId}] show-header="${showHeaderAttr}" -> parsedShowHeader:`, parsedShowHeader);
+        console.log(`[${elementId}] show-play-button="${showPlayButtonAttr}" -> parsedShowPlayButton:`, parsedShowPlayButton);
+        console.log(`[${elementId}] show-reset-button="${showResetButtonAttr}" -> parsedShowResetButton:`, parsedShowResetButton);
+        console.log(`[${elementId}] show-theme-toggle="${showThemeToggleAttr}" -> parsedShowThemeToggle:`, parsedShowThemeToggle);
+        console.log(`[${elementId}] show-window-buttons="${showWindowButtonsAttr}" -> parsedShowWindowButtons:`, parsedShowWindowButtons);
+      } else {
+        console.error(`[${elementId}] ❌ FAILED: Could not find host terminal-session element with any method!`);
+        console.error(`[${elementId}] This suggests a fundamental issue with custom element structure.`);
+      }
+    }
+    
+    // Helper function for parent chain debugging
+    function getParentChain(element) {
+      const chain = [];
+      let current = element;
+      while (current && chain.length < 10) { // Limit to avoid infinite loops
+        chain.push({
+          tag: current.tagName,
+          class: current.className,
+          id: current.id
+        });
+        current = current.parentElement;
+      }
+      return chain;
+    }
+    
     // Initialize first tab if tabs are provided
     if (showTabs && tabs && tabs.length > 0) {
       const firstTab = tabs[currentTabIndex] || tabs[0];

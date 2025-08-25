@@ -118,6 +118,98 @@
     </div>
 
     <div class="demo-section">
+      <h2>Customizable Toolbar & Header</h2>
+      <p>Fine-grained control over all UI elements:</p>
+      <div class="features">
+        <div class="feature">
+          <h3>No Window Buttons</h3>
+          <terminal-session 
+            id="toolbar-no-window"
+            title="No Window Controls"
+            show-window-buttons="false"
+            playback-speed="2"
+          ></terminal-session>
+        </div>
+        <div class="feature">
+          <h3>No Control Buttons</h3>
+          <terminal-session 
+            id="toolbar-no-controls"
+            title="Clean Header"
+            show-play-button="false"
+            show-reset-button="false"
+            show-theme-toggle="false"
+            show-window-buttons="false"
+            autoplay="true"
+          ></terminal-session>
+        </div>
+        <div class="feature">
+          <h3>Play Button Only</h3>
+          <terminal-session 
+            id="toolbar-play-only"
+            title="Minimal Controls"
+            show-reset-button="false"
+            show-theme-toggle="false"
+            show-window-buttons="false"
+          ></terminal-session>
+        </div>
+        <div class="feature">
+          <h3>No Header At All</h3>
+          <terminal-session 
+            id="toolbar-no-header"
+            show-header="false"
+            autoplay="true"
+          ></terminal-session>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Tabbed Terminal with Background Processing</h2>
+      <p>Tabs continue processing in the background when you switch between them:</p>
+      <terminal-session 
+        id="tabbed-terminal"
+        show-tabs="true"
+        allow-tab-close="true"
+        tab-bar-position="top"
+        autoplay="true"
+        playback-speed="1.5"
+      ></terminal-session>
+      <p style="color: #666; font-size: 14px; margin-top: 10px;">
+        💡 Try switching between tabs - they continue running in the background!
+      </p>
+    </div>
+    
+    <div class="demo-section">
+      <h2>Minimal Tabbed Terminal</h2>
+      <p>Tabs below header without any control buttons for a clean interface:</p>
+      <terminal-session 
+        id="tabbed-minimal"
+        show-tabs="true"
+        show-play-button="false"
+        show-reset-button="false"
+        show-theme-toggle="false"
+        show-window-buttons="false"
+        allow-tab-close="true"
+        tab-bar-position="top"
+        autoplay="true"
+      ></terminal-session>
+    </div>
+    
+    <div class="demo-section">
+      <h2>Completely Minimal - No Toolbar</h2>
+      <p>Terminal without any header or controls, just the content:</p>
+      <terminal-session 
+        id="minimal-no-toolbar"
+        show-header="false"
+        autoplay="true"
+        theme="dark"
+      ></terminal-session>
+      <p style="color: #666; font-size: 14px; margin-top: 10px;">
+        💡 Perfect for embedding in documentation or tutorials
+      </p>
+    </div>
+
+    <div class="demo-section">
       <h2>Interactive Controls</h2>
       <div class="controls">
         <button onclick="addCustomSession()">Load Custom Session</button>
@@ -155,25 +247,84 @@
           <h3>🔧 Customizable</h3>
           <p>Configurable speed, colors, and behavior</p>
         </div>
+        <div class="feature">
+          <h3>🎛️ Full UI Control</h3>
+          <p>Show/hide header, window buttons, and control buttons individually</p>
+        </div>
+        <div class="feature">
+          <h3>⌨️ Typing Effect</h3>
+          <p>Realistic typing animation with variable speed</p>
+        </div>
+        <div class="feature">
+          <h3>📑 Advanced Tabs</h3>
+          <p>Background processing, closable tabs, top/bottom position</p>
+        </div>
+        <div class="feature">
+          <h3>👁️ Smart Autoplay</h3>
+          <p>Autoplay on visibility, tab switch, or manual trigger</p>
+        </div>
+        <div class="feature">
+          <h3>🔄 State Persistence</h3>
+          <p>Tabs maintain state when switching</p>
+        </div>
+        <div class="feature">
+          <h3>🎯 Web Component</h3>
+          <p>HTML attributes with proper type conversion</p>
+        </div>
       </div>
     </div>
 
     <div class="demo-section">
-      <h2>Usage Example</h2>
+      <h2>Usage Examples</h2>
       <div class="code-example">
+&lt;!-- Basic terminal with custom controls --&gt;
 &lt;terminal-session
   theme="dark"
   autoplay="true"
   playback-speed="1.5"
   title="My Terminal"
+  show-window-buttons="false"
+  show-reset-button="false"
+&gt;&lt;/terminal-session&gt;
+
+&lt;!-- Minimal terminal without header --&gt;
+&lt;terminal-session
+  show-header="false"
+  autoplay="true"
+&gt;&lt;/terminal-session&gt;
+
+&lt;!-- Tabbed terminal with bottom tabs --&gt;
+&lt;terminal-session
+  show-tabs="true"
+  tab-bar-position="bottom"
+  allow-tab-close="true"
 &gt;&lt;/terminal-session&gt;
 
 &lt;script&gt;
   const terminal = document.querySelector('terminal-session');
+  
+  // Set a simple session
   terminal.session = [
     { type: 'command', content: 'npm install', delay: 500 },
-    { type: 'output', content: 'Installing dependencies...', delay: 1000 },
-    { type: 'success', content: 'Dependencies installed successfully!', delay: 500 }
+    { type: 'output', content: 'Installing...', delay: 1000 },
+    { type: 'success', content: 'Done!', delay: 500 }
+  ];
+  
+  // Or set tabs for multiple sessions
+  terminal.tabs = [
+    {
+      id: 'tab1',
+      title: 'Server',
+      icon: '🖥️',
+      session: serverSession,
+      closable: true
+    },
+    {
+      id: 'tab2',
+      title: 'Tests',
+      icon: '🧪',
+      session: testSession
+    }
   ];
 &lt;/script&gt;
       </div>
@@ -181,7 +332,7 @@
   </div>
 
   <script type="module">
-    import './src/lib/Terminal.svelte';
+    import './dist/terminal-session.es.js';
 
     // Basic terminal session
     const basicSession = [
@@ -203,6 +354,132 @@
 
     document.getElementById('light-terminal').session = basicSession;
     document.getElementById('light-terminal').autoplay = false;
+    
+    // Toolbar demo terminals
+    document.getElementById('toolbar-no-window').session = basicSession;
+    document.getElementById('toolbar-no-controls').session = basicSession;
+    document.getElementById('toolbar-play-only').session = basicSession;
+    document.getElementById('toolbar-no-header').session = basicSession;
+    
+    // Tabbed terminal setup
+    const tabbedTerminal = document.getElementById('tabbed-terminal');
+    tabbedTerminal.tabs = [
+      {
+        id: 'git-tab',
+        title: 'Git Workflow',
+        icon: '📦',
+        session: basicSession,
+        closable: true,
+        status: 'success'
+      },
+      {
+        id: 'build-tab',
+        title: 'Build Process',
+        icon: '🔨',
+        session: [
+          { type: 'command', content: 'npm run build', delay: 500 },
+          { type: 'output', content: '> vite build', delay: 600 },
+          { type: 'info', content: 'vite v5.0.0 building for production...', delay: 800 },
+          { type: 'output', content: 'transforming (142)...', delay: 1000 },
+          { type: 'output', content: '✓ 142 modules transformed.', delay: 1200 },
+          { type: 'success', content: 'build completed in 2.14s', delay: 500 }
+        ],
+        closable: true,
+        badge: 3,
+        status: 'running'
+      },
+      {
+        id: 'test-tab',
+        title: 'Tests',
+        icon: '🧪',
+        session: [
+          { type: 'command', content: 'npm test', delay: 500 },
+          { type: 'output', content: 'Running test suite...', delay: 800 },
+          { type: 'success', content: '✓ Authentication tests passed (5/5)', delay: 600 },
+          { type: 'success', content: '✓ API tests passed (12/12)', delay: 600 },
+          { type: 'error', content: '✗ UI tests failed (2/10)', delay: 600 },
+          { type: 'warning', content: 'Total: 17 passed, 2 failed', delay: 500 }
+        ],
+        closable: false,
+        status: 'error'
+      },
+      {
+        id: 'logs-tab',
+        title: 'Server Logs',
+        icon: '📋',
+        session: [
+          { type: 'info', content: '[2024-01-15 10:23:45] Server started on port 3000', delay: 300 },
+          { type: 'output', content: '[2024-01-15 10:23:46] Database connected', delay: 400 },
+          { type: 'warning', content: '[2024-01-15 10:23:47] Deprecation warning: Using old API', delay: 500 },
+          { type: 'success', content: '[2024-01-15 10:23:48] All services initialized', delay: 400 },
+          { type: 'output', content: '[2024-01-15 10:23:49] Listening for connections...', delay: 500 }
+        ],
+        closable: true,
+        status: 'idle'
+      }
+    ];
+    
+    // Minimal tabbed terminal
+    const minimalTabbed = document.getElementById('tabbed-minimal');
+    if (minimalTabbed) {
+      minimalTabbed.tabs = [
+        {
+          id: 'minimal-1',
+          title: 'Process 1',
+          icon: '1️⃣',
+          session: [
+            { type: 'command', content: 'docker-compose up', delay: 500 },
+            { type: 'output', content: 'Creating network "app_default"', delay: 600 },
+            { type: 'output', content: 'Creating volume "app_data"', delay: 700 },
+            { type: 'info', content: 'Starting database container...', delay: 800 },
+            { type: 'success', content: 'Database is ready for connections', delay: 1000 },
+            { type: 'info', content: 'Starting application container...', delay: 800 },
+            { type: 'success', content: 'Application started on port 3000', delay: 900 }
+          ],
+          closable: true
+        },
+        {
+          id: 'minimal-2',
+          title: 'Process 2',
+          icon: '2️⃣',
+          session: [
+            { type: 'command', content: 'npm run dev', delay: 500 },
+            { type: 'output', content: 'Starting development server...', delay: 700 },
+            { type: 'info', content: 'Vite v5.0.0 dev server running at:', delay: 600 },
+            { type: 'success', content: 'http://localhost:5173', delay: 400 },
+            { type: 'output', content: 'ready in 523ms', delay: 500 }
+          ],
+          closable: true
+        },
+        {
+          id: 'minimal-3',
+          title: 'Process 3',
+          icon: '3️⃣',
+          session: [
+            { type: 'command', content: 'npm run test:watch', delay: 500 },
+            { type: 'output', content: 'Watching for file changes...', delay: 800 },
+            { type: 'success', content: '✓ 15 tests passed', delay: 1200 },
+            { type: 'info', content: 'Waiting for file changes...', delay: 600 }
+          ],
+          closable: false
+        }
+      ];
+    }
+
+    // Minimal no-toolbar terminal
+    const minimalNoToolbar = document.getElementById('minimal-no-toolbar');
+    if (minimalNoToolbar) {
+      minimalNoToolbar.session = [
+        { type: 'command', content: 'curl -X GET https://api.example.com/data', delay: 500 },
+        { type: 'output', content: '{"status": "success", "data": {', delay: 600 },
+        { type: 'output', content: '  "users": 1247,', delay: 400 },
+        { type: 'output', content: '  "active": true,', delay: 400 },
+        { type: 'output', content: '  "timestamp": "2024-01-15T10:30:00Z"', delay: 400 },
+        { type: 'output', content: '}}', delay: 300 },
+        { type: 'command', content: 'echo "API call successful"', delay: 800 },
+        { type: 'success', content: 'API call successful', delay: 500 }
+      ];
+    }
 
     // Custom colors terminal
     const customTerminal = document.getElementById('custom-terminal');
@@ -236,6 +513,12 @@
     observer.observe(document.getElementById('basic-terminal'));
     observer.observe(document.getElementById('light-terminal'));
     observer.observe(document.getElementById('custom-terminal'));
+    observer.observe(document.getElementById('toolbar-no-window'));
+    observer.observe(document.getElementById('toolbar-play-only'));
+    observer.observe(document.getElementById('toolbar-no-header'));
+    if (document.getElementById('minimal-no-toolbar')) {
+      observer.observe(document.getElementById('minimal-no-toolbar'));
+    }
 
     // Interactive terminal
     const interactiveTerminal = document.getElementById('interactive-terminal');
