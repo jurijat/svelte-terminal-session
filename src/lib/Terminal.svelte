@@ -761,7 +761,7 @@
               {@const firstSegment = row[0]}
               {@const columnGap = firstSegment?.columnGap || '16px'}
               {@const rowGap = firstSegment?.rowGap || '4px'}
-              <div class="terminal-table-row" style="column-gap: {columnGap}; margin-bottom: {rowGap};">
+              <div class="terminal-table-row" style="gap: {columnGap}; margin-bottom: {rowGap};">
                 {#each row as segment}
                   <div class="terminal-table-cell {segment.tableColumn ? `col-${segment.tableColumn}` : ''}" 
                     style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.width ? `width: ${segment.width};` : ''}{segment.align ? `text-align: ${segment.align};` : ''}">
@@ -1159,6 +1159,7 @@
   .terminal-table-row {
     display: grid !important;
     grid-template-columns: 60px 100px 180px 1fr !important;
+    gap: 16px;
     min-height: 1.5em;
     align-items: baseline;
     font-family: inherit;
@@ -1166,25 +1167,23 @@
 
   .terminal-table-cell {
     overflow: visible;
-    padding-right: 8px;
   }
 
   /* Semantic column styling with fixed positioning */
   .terminal-table-row .terminal-table-cell.col-position {
     grid-column: 1;
-    text-align: left;
+    text-align: right;
     white-space: nowrap;
   }
 
   .terminal-table-row .terminal-table-cell.col-type {
     grid-column: 2;
-    text-align: left;
+    text-align: right;
     white-space: nowrap;
   }
 
   .terminal-table-row .terminal-table-cell.col-rule {
     grid-column: 3;
-    text-align: left;
     white-space: nowrap;
   }
 
@@ -1192,6 +1191,5 @@
     grid-column: 4;
     white-space: normal;
     word-break: break-word;
-    text-align: left;
   }
 </style>
