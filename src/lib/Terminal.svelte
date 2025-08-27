@@ -797,7 +797,7 @@
     {#each displayedSteps as step, index}
       {#if isRichContent(step.content) && hasTableContent(step.content)}
         <!-- Table content (outside pre) -->
-        <div class="terminal-line {getStepClass(step.type)}">
+        <div class="terminal-line {getStepClass(step.type)}" style="{step.marginTop ? `margin-top: ${step.marginTop};` : ''}{step.marginBottom ? `margin-bottom: ${step.marginBottom};` : ''}">
           <div class="terminal-table">
             {#each groupIntoTableRows(step.content) as row}
               {@const firstSegment = row[0]}
@@ -816,8 +816,8 @@
         </div>
       {:else}
         <!-- Regular content (in pre) -->
-        <div class="terminal-line {getStepClass(step.type)}">
-<pre>{#if step.type === 'command'}{step.prompt || '$'} {/if}{#if index === typingStepIndex}{typedContent}{:else if isRichContent(step.content)}{#each step.content as segment}<span class="rich-text-segment" style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}">{@html segment.text.replace(/\n/g, '<br>')}</span>{/each}{:else}{@html step.content.replace(/\n/g, '<br>')}{/if}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
+        <div class="terminal-line {getStepClass(step.type)}" style="{step.marginTop ? `margin-top: ${step.marginTop};` : ''}{step.marginBottom ? `margin-bottom: ${step.marginBottom};` : ''}">
+<pre>{#if step.type === 'command'}{step.prompt || '$'} {/if}{#if index === typingStepIndex}{typedContent}{:else if isRichContent(step.content)}{#each step.content as segment}{#if segment.display === 'block'}<div class="rich-text-segment" style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.marginTop ? `margin-top: ${segment.marginTop};` : ''}{segment.marginBottom ? `margin-bottom: ${segment.marginBottom};` : ''}{segment.marginLeft ? `margin-left: ${segment.marginLeft};` : ''}{segment.marginRight ? `margin-right: ${segment.marginRight};` : ''}">{@html segment.text.replace(/\n/g, '<br>')}</div>{:else}<span class="rich-text-segment" style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.marginLeft ? `margin-left: ${segment.marginLeft};` : ''}{segment.marginRight ? `margin-right: ${segment.marginRight};` : ''}">{@html segment.text.replace(/\n/g, '<br>')}</span>{/if}{/each}{:else}{@html step.content.replace(/\n/g, '<br>')}{/if}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
         </div>
       {/if}
     {/each}

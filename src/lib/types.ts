@@ -13,6 +13,12 @@ export interface RichTextSegment {
   fontWeight?: 'normal' | 'bold';
   textDecoration?: 'none' | 'underline';
   fontStyle?: 'normal' | 'italic';
+  // Spacing and display properties
+  display?: 'inline' | 'block'; // Display type for the segment
+  marginTop?: string; // CSS margin like "10px", "1em"
+  marginBottom?: string; // CSS margin like "10px", "1em"
+  marginLeft?: string; // CSS margin like "10px", "1em"
+  marginRight?: string; // CSS margin like "10px", "1em"
   // Table/Grid layout properties
   tableColumn?: 'position' | 'type' | 'rule' | 'message'; // Semantic column types
   width?: string; // CSS width like "60px", "20%"
@@ -33,6 +39,9 @@ export interface SessionStep {
   prompt?: string;
   typingSpeed?: number; // Override global typing speed for this step (chars per second)
   skipTyping?: boolean; // Skip typing effect for this specific command
+  // Spacing properties for the entire step
+  marginTop?: string; // CSS margin like "10px", "1em"
+  marginBottom?: string; // CSS margin like "10px", "1em"
 }
 
 export type Theme = "light" | "dark" | "auto";
