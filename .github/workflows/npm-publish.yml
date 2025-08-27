@@ -51,18 +51,21 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
-      - name: Comment on Release
+      - name: Update Release with NPM Info
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const version = '${{ steps.package-version.outputs.version }}';
-            await github.rest.repos.createReleaseComment({
+            const currentBody = context.payload.release.body || '';
+            const npmInfo = `\n\n---\n📦 Successfully published to npm!\n\nInstall with:\n\`\`\`bash\nnpm install svelte-terminal-session@${version}\n\`\`\`\n\nView on npm: https://www.npmjs.com/package/svelte-terminal-session/v/${version}`;
+            
+            await github.rest.repos.updateRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               release_id: context.payload.release.id,
-              body: `📦 Successfully published to npm!\n\nInstall with:\n\`\`\`bash\nnpm install svelte-terminal-session@${version}\n\`\`\`\n\nView on npm: https://www.npmjs.com/package/svelte-terminal-session/v/${version}`
-            }).catch(() => {
-              // If commenting fails, just log it
-              console.log('Could not add comment to release');
+              body: currentBody + npmInfo
+            }).catch((error) => {
+              // If updating fails, just log it
+              console.log('Could not update release:', error.message);
             });
