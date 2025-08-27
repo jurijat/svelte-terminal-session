@@ -21,7 +21,7 @@
 }} />
 
 <script lang="ts">
-  import { onMount, onDestroy, tick } from 'svelte';
+  import { tick } from 'svelte';
   import type { SessionStep, Theme, ColorScheme, TabConfig, TabState } from './types';
   import { darkTheme, lightTheme, applyTheme, mergeColors } from './themes';
 
@@ -96,21 +96,16 @@
   );
   
   // Lifecycle: Handle component mount
-  // Manual attribute parsing state
-  let parsedShowHeader = $state(true);
-  let parsedShowPlayButton = $state(true);
-  let parsedShowResetButton = $state(true);
-  let parsedShowThemeToggle = $state(true);
-  let parsedShowWindowButtons = $state(true);
+  // No longer need manual attribute parsing - Svelte handles this for custom elements
 
-  // Computed button visibility (handle both boolean false and string "false")
-  let showPlayButtonComputed = $derived(parsedShowPlayButton);
+  // Computed button visibility - use props directly with defaults
+  let showPlayButtonComputed = $derived(showPlayButton ?? true);
   
-  let showResetButtonComputed = $derived(parsedShowResetButton);
+  let showResetButtonComputed = $derived(showResetButton ?? true);
   
-  let showThemeToggleComputed = $derived(parsedShowThemeToggle);
+  let showThemeToggleComputed = $derived(showThemeToggle ?? true);
   
-  let showWindowButtonsComputed = $derived(parsedShowWindowButtons);
+  let showWindowButtonsComputed = $derived(showWindowButtons ?? true);
   
   // Check if any control buttons should be shown
   let hasControlButtons = $derived(
@@ -118,8 +113,8 @@
   );
   
   
-  // Use manually parsed header visibility
-  let showHeaderComputed = $derived(parsedShowHeader);
+  // Use header visibility prop with default
+  let showHeaderComputed = $derived(showHeader ?? true);
   
   // Playback state - These are the ONLY stateful variables
   let currentStepIndex = $state(0);
@@ -355,138 +350,17 @@
     }
   }
 
+  // Use $effect instead of onMount to avoid lifecycle issues in web components
+  let observer: IntersectionObserver | null = null;
+  let interval: ReturnType<typeof setInterval> | null = null;
   
-  onMount(() => {
-    // Manual attribute parsing - try multiple methods to access the host custom element
-    if (terminalElement) {
-      const elementId = 'terminal-' + Math.random().toString(36).substr(2, 9);
-      
-      // Try multiple methods to find the host element
-      let hostElement = null;
-      let method = 'none';
-      
-      // Method 1: closest() - standard approach
-      const closestElement = terminalElement.closest('terminal-session');
-      if (closestElement) {
-        hostElement = closestElement;
-        method = 'closest()';
-      }
-      
-      // Method 2: parentElement traversal
-      let current = terminalElement.parentElement;
-      while (current && !hostElement) {
-        if (current.tagName?.toLowerCase() === 'terminal-session') {
-          hostElement = current;
-          method = 'parentElement traversal';
-          break;
-        }
-        current = current.parentElement;
-      }
-      
-      // Method 3: getRootNode() approach
-      if (!hostElement) {
-        const root = terminalElement.getRootNode();
-        if (root && root.host && root.host.tagName?.toLowerCase() === 'terminal-session') {
-          hostElement = root.host;
-          method = 'getRootNode().host';
-        }
-      }
-      
-      // Method 4: Direct document query (fallback)
-      if (!hostElement) {
-        const allTerminals = document.querySelectorAll('terminal-session');
-        for (const terminal of allTerminals) {
-          if (terminal.contains(terminalElement)) {
-            hostElement = terminal;
-            method = 'document.querySelectorAll + contains()';
-            break;
-          }
-        }
-      }
-      
-      // Comprehensive DOM debugging
-      console.log(`[${elementId}] DOM Structure Analysis:`);
-      console.log(`[${elementId}] Inner element:`, terminalElement.tagName, terminalElement.className);
-      console.log(`[${elementId}] Parent chain:`, getParentChain(terminalElement));
-      console.log(`[${elementId}] Root node:`, terminalElement.getRootNode()?.constructor?.name);
-      console.log(`[${elementId}] Host found via:`, method);
-      console.log(`[${elementId}] Host element:`, hostElement?.tagName, hostElement?.id);
-      
-      if (hostElement) {
-        // Parse attributes from the host element
-        const showHeaderAttr = hostElement.getAttribute('show-header');
-        parsedShowHeader = showHeaderAttr === 'false' ? false : (showHeader ?? true);
-        
-        const showPlayButtonAttr = hostElement.getAttribute('show-play-button');
-        parsedShowPlayButton = showPlayButtonAttr === 'false' ? false : (showPlayButton ?? true);
-        
-        const showResetButtonAttr = hostElement.getAttribute('show-reset-button');
-        parsedShowResetButton = showResetButtonAttr === 'false' ? false : (showResetButton ?? true);
-        
-        const showThemeToggleAttr = hostElement.getAttribute('show-theme-toggle');
-        parsedShowThemeToggle = showThemeToggleAttr === 'false' ? false : (showThemeToggle ?? true);
-        
-        const showWindowButtonsAttr = hostElement.getAttribute('show-window-buttons');
-        parsedShowWindowButtons = showWindowButtonsAttr === 'false' ? false : (showWindowButtons ?? true);
-        
-        // Success logging
-        console.log(`[${elementId}] ✅ ATTRIBUTES FOUND:`);
-        console.log(`[${elementId}] show-header="${showHeaderAttr}" -> parsedShowHeader:`, parsedShowHeader);
-        console.log(`[${elementId}] show-play-button="${showPlayButtonAttr}" -> parsedShowPlayButton:`, parsedShowPlayButton);
-        console.log(`[${elementId}] show-reset-button="${showResetButtonAttr}" -> parsedShowResetButton:`, parsedShowResetButton);
-        console.log(`[${elementId}] show-theme-toggle="${showThemeToggleAttr}" -> parsedShowThemeToggle:`, parsedShowThemeToggle);
-        console.log(`[${elementId}] show-window-buttons="${showWindowButtonsAttr}" -> parsedShowWindowButtons:`, parsedShowWindowButtons);
-      } else {
-        console.error(`[${elementId}] ❌ FAILED: Could not find host terminal-session element with any method!`);
-        console.error(`[${elementId}] This suggests a fundamental issue with custom element structure.`);
-      }
-    }
-    
-    // Helper function for parent chain debugging
-    function getParentChain(element) {
-      const chain = [];
-      let current = element;
-      while (current && chain.length < 10) { // Limit to avoid infinite loops
-        chain.push({
-          tag: current.tagName,
-          class: current.className,
-          id: current.id
-        });
-        current = current.parentElement;
-      }
-      return chain;
-    }
-    
-    // Initialize first tab if tabs are provided
-    if (showTabs && tabs && tabs.length > 0) {
-      const firstTab = tabs[currentTabIndex] || tabs[0];
-      if (firstTab) {
-        lastTabId = firstTab.id;
-      }
-    }
-    
-    // Set up IntersectionObserver for visibility-based autoplay
-    let observer: IntersectionObserver | null = null;
-    if (typeof IntersectionObserver !== 'undefined' && terminalElement) {
+  // Effect 1: Set up IntersectionObserver to track visibility only
+  $effect(() => {
+    if (terminalElement && !observer && typeof IntersectionObserver !== 'undefined') {
       observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             isVisible = entry.isIntersecting;
-            
-            // Start autoplay when becoming visible
-            if (entry.isIntersecting && autoplay && !hasAutoPlayed && !isPlaying) {
-              const activeSession = currentSession;
-              if (activeSession && activeSession.length > 0 && currentStepIndex === 0) {
-                hasAutoPlayed = true;
-                setTimeout(() => startPlayback(), 300);
-              }
-            }
-            
-            // Optionally pause when going out of view
-            if (!entry.isIntersecting && isPlaying) {
-              // Uncomment to pause when scrolled out of view
-              // isPlaying = false;
-            }
           });
         },
         { threshold: 0.1 } // Trigger when 10% visible
@@ -495,70 +369,95 @@
       observer.observe(terminalElement);
     }
     
-    // Check if session changed (for web component prop updates)
-    // This runs once per mount, not in a reactive loop
-    const checkSessionChange = () => {
-      const activeSession = currentSession;
-      
-      // Only check for completely new sessions, not tab switches
-      if (!showTabs && activeSession && activeSession.length !== lastSessionLength) {
-        lastSessionLength = activeSession.length;
-        
-        // Only reset if we had previous content
-        if (displayedSteps.length > 0 || currentStepIndex > 0) {
-          resetPlayback();
-          hasAutoPlayed = false; // Reset autoplay flag for new session
-        }
-        
-        // Handle autoplay for new session
-        if (autoplay && activeSession.length > 0 && (isVisible || !observer)) {
-          if (!hasAutoPlayed) {
-            hasAutoPlayed = true;
-            setTimeout(() => startPlayback(), 100);
-          }
-        }
-      }
-      
-      // Don't interfere with manual tab switches
-      // This should only handle initial tab setup
-      if (showTabs && currentTab && currentTab.id !== lastTabId && !tabStates.has(currentTab.id)) {
-        // Only for initial setup of tabs
-        lastTabId = currentTab.id;
-        if (autoplay && currentSession && currentSession.length > 0) {
-          setTimeout(() => startPlayback(), 300);
-        }
-      }
-    };
-
-    // Initial check
-    checkSessionChange();
-    
-    // Set up interval to check for prop changes (web components don't trigger reactivity)
-    const interval = setInterval(checkSessionChange, 500);
-
     // Cleanup
     return () => {
-      clearInterval(interval);
       if (observer) {
         observer.disconnect();
-      }
-      if (playbackTimer) {
-        clearTimeout(playbackTimer);
-      }
-      if (typingTimer) {
-        clearTimeout(typingTimer);
+        observer = null;
       }
     };
   });
+  
+  // Effect 2: Handle autoplay reactively when conditions are met
+  $effect(() => {
+    if (
+      autoplay && 
+      isVisible && 
+      !hasAutoPlayed && 
+      !isPlaying && 
+      currentSession && 
+      currentSession.length > 0 && 
+      currentStepIndex === 0
+    ) {
+      hasAutoPlayed = true;
+      setTimeout(() => startPlayback(), 300);
+    }
+  });
+  
+  // Effect 3: Initialize component and handle session changes
+  $effect(() => {
+    if (terminalElement) {
+      // Initialize first tab if tabs are provided
+      if (showTabs && tabs && tabs.length > 0) {
+        const firstTab = tabs[currentTabIndex] || tabs[0];
+        if (firstTab) {
+          lastTabId = firstTab.id;
+        }
+      }
+      
+      // Check if session changed (for web component prop updates)
+      // This runs once per mount, not in a reactive loop
+      const checkSessionChange = () => {
+        const activeSession = currentSession;
+        
+        // Only check for completely new sessions, not tab switches
+        if (!showTabs && activeSession && activeSession.length !== lastSessionLength) {
+          lastSessionLength = activeSession.length;
+          
+          // Only reset if we had previous content
+          if (displayedSteps.length > 0 || currentStepIndex > 0) {
+            resetPlayback();
+            hasAutoPlayed = false; // Reset autoplay flag for new session
+          }
+          
+          // Reset autoplay flag for new session - the reactive effect will handle starting autoplay
+          // This ensures autoplay works for new sessions
+        }
+        
+        // Don't interfere with manual tab switches
+        // This should only handle initial tab setup
+        if (showTabs && currentTab && currentTab.id !== lastTabId && !tabStates.has(currentTab.id)) {
+          // Only for initial setup of tabs
+          lastTabId = currentTab.id;
+          // Reset autoplay flag for new tab - the reactive effect will handle starting autoplay
+          if (!tabStates.has(currentTab.id)) {
+            hasAutoPlayed = false;
+          }
+        }
+      };
 
-  // Lifecycle: Clean up on destroy
-  onDestroy(() => {
-    if (playbackTimer) {
-      clearTimeout(playbackTimer);
+      // Initial check
+      checkSessionChange();
+      
+      // Set up interval to check for prop changes (web components don't trigger reactivity)
+      interval = setInterval(checkSessionChange, 500);
     }
-    if (typingTimer) {
-      clearTimeout(typingTimer);
-    }
+    
+    // Cleanup function for the effect
+    return () => {
+      if (interval !== null) {
+        clearInterval(interval);
+        interval = null;
+      }
+      if (playbackTimer) {
+        clearTimeout(playbackTimer);
+        playbackTimer = null;
+      }
+      if (typingTimer) {
+        clearTimeout(typingTimer);
+        typingTimer = null;
+      }
+    };
   });
 
   // Handle theme toggle
