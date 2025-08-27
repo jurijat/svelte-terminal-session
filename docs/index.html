@@ -1,771 +1,1138 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terminal Session Web Component Demo</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      color: white;
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .demo-section {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    .demo-section h2 {
-      margin-top: 0;
-      color: #333;
-    }
-
-    terminal-session {
-      height: 400px;
-      margin: 20px 0;
-    }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background: #667eea;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #5a64d8;
-    }
-
-    .code-example {
-      background: #f6f8fa;
-      border: 1px solid #d1d5da;
-      border-radius: 6px;
-      padding: 15px;
-      margin: 20px 0;
-      font-family: 'Monaco', 'Consolas', monospace;
-      font-size: 13px;
-      overflow-x: auto;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin: 20px 0;
-    }
-
-    .feature {
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      border-left: 4px solid #667eea;
-    }
-
-    .feature h3 {
-      margin-top: 0;
-      color: #667eea;
-    }
-
-    .github-link {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 12px 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.3s;
-      z-index: 1000;
-    }
-
-    .github-link:hover {
-      background: white;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-      transform: translateY(-2px);
-    }
-
-    .github-link svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    @media (max-width: 768px) {
-      .github-link {
-        position: static;
-        margin: 0 auto 20px;
-        display: inline-flex;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terminal Session Web Component Demo</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
       }
-      
+
       .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: white;
         text-align: center;
+        margin-bottom: 40px;
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <a href="https://github.com/jurijat/svelte-terminal-session" target="_blank" class="github-link">
-      <svg viewBox="0 0 16 16" fill="currentColor">
-        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-      </svg>
-      View on GitHub
-    </a>
-    <h1>🖥️ Terminal Session Web Component Demo</h1>
 
-    <div class="demo-section">
-      <h2>Basic Example</h2>
-      <p>A simple terminal showing a git workflow session:</p>
-      <terminal-session id="basic-terminal"></terminal-session>
-    </div>
+      .demo-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
 
-    <div class="demo-section">
-      <h2>Light Theme Example</h2>
-      <p>Same session with light theme:</p>
-      <terminal-session id="light-terminal" theme="light"></terminal-session>
-    </div>
+      .demo-section h2 {
+        margin-top: 0;
+        color: #333;
+      }
 
-    <div class="demo-section">
-      <h2>Custom Colors Example</h2>
-      <p>Terminal with custom color scheme:</p>
-      <terminal-session id="custom-terminal"></terminal-session>
-    </div>
+      terminal-session {
+        height: 400px;
+        margin: 20px 0;
+      }
 
-    <div class="demo-section">
-      <h2>Customizable Toolbar & Header</h2>
-      <p>Fine-grained control over all UI elements:</p>
-      <div class="features">
-        <div class="feature">
-          <h3>No Window Buttons</h3>
-          <terminal-session 
-            id="toolbar-no-window"
-            title="No Window Controls"
-            show-window-buttons="false"
-            playback-speed="2"
-          ></terminal-session>
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        background: #667eea;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+
+      button:hover {
+        background: #5a64d8;
+      }
+
+      .code-example {
+        background: #f6f8fa;
+        border: 1px solid #d1d5da;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 20px 0;
+        font-family: "Monaco", "Consolas", monospace;
+        font-size: 13px;
+        overflow-x: auto;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .feature {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+      }
+
+      .feature h3 {
+        margin-top: 0;
+        color: #667eea;
+      }
+
+      .github-link {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+        z-index: 1000;
+      }
+
+      .github-link:hover {
+        background: white;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .github-link svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      @media (max-width: 768px) {
+        .github-link {
+          position: static;
+          margin: 0 auto 20px;
+          display: inline-flex;
+        }
+
+        .container {
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a
+        href="https://github.com/jurijat/svelte-terminal-session"
+        target="_blank"
+        class="github-link"
+      >
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <path
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+          />
+        </svg>
+        View on GitHub
+      </a>
+      <h1>🖥️ Terminal Session Web Component Demo</h1>
+
+      <div class="demo-section">
+        <h2>Basic Example</h2>
+        <p>A simple terminal showing a git workflow session:</p>
+        <terminal-session id="basic-terminal"></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Light Theme Example</h2>
+        <p>Same session with light theme:</p>
+        <terminal-session id="light-terminal" theme="light"></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Custom Colors Example</h2>
+        <p>Terminal with custom color scheme:</p>
+        <terminal-session id="custom-terminal"></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Customizable Toolbar & Header</h2>
+        <p>Fine-grained control over all UI elements:</p>
+        <div class="features">
+          <div class="feature">
+            <h3>No Window Buttons</h3>
+            <terminal-session
+              id="toolbar-no-window"
+              title="No Window Controls"
+              show-window-buttons="false"
+              playback-speed="2"
+            ></terminal-session>
+          </div>
+          <div class="feature">
+            <h3>No Control Buttons</h3>
+            <terminal-session
+              id="toolbar-no-controls"
+              title="Clean Header"
+              show-play-button="false"
+              show-reset-button="false"
+              show-theme-toggle="false"
+              show-window-buttons="false"
+            ></terminal-session>
+          </div>
+          <div class="feature">
+            <h3>Play Button Only</h3>
+            <terminal-session
+              id="toolbar-play-only"
+              title="Minimal Controls"
+              show-reset-button="false"
+              show-theme-toggle="false"
+              show-window-buttons="false"
+            ></terminal-session>
+          </div>
+          <div class="feature">
+            <h3>No Header At All</h3>
+            <terminal-session
+              id="toolbar-no-header"
+              show-header="false"
+            ></terminal-session>
+          </div>
         </div>
-        <div class="feature">
-          <h3>No Control Buttons</h3>
-          <terminal-session 
-            id="toolbar-no-controls"
-            title="Clean Header"
-            show-play-button="false"
-            show-reset-button="false"
-            show-theme-toggle="false"
-            show-window-buttons="false"
-          ></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Tabbed Terminal with Background Processing</h2>
+        <p>
+          Tabs continue processing in the background when you switch between
+          them:
+        </p>
+        <terminal-session
+          id="tabbed-terminal"
+          show-tabs="true"
+          allow-tab-close="true"
+          tab-bar-position="top"
+          playback-speed="1.5"
+        ></terminal-session>
+        <p style="color: #666; font-size: 14px; margin-top: 10px">
+          💡 Try switching between tabs - they continue running in the
+          background!
+        </p>
+      </div>
+
+      <div class="demo-section">
+        <h2>Minimal Tabbed Terminal</h2>
+        <p>
+          Tabs below header without any control buttons for a clean interface:
+        </p>
+        <terminal-session
+          id="tabbed-minimal"
+          show-tabs="true"
+          show-play-button="false"
+          show-reset-button="false"
+          show-theme-toggle="false"
+          show-window-buttons="false"
+          allow-tab-close="true"
+          tab-bar-position="top"
+        ></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Completely Minimal - No Toolbar</h2>
+        <p>Terminal without any header or controls, just the content:</p>
+        <terminal-session
+          id="minimal-no-toolbar"
+          show-header="false"
+          theme="dark"
+          autoplay="true"
+        ></terminal-session>
+        <p style="color: #666; font-size: 14px; margin-top: 10px">
+          💡 Perfect for embedding in documentation or tutorials
+        </p>
+      </div>
+
+      <div class="demo-section">
+        <h2>Rich Text Colorization</h2>
+        <p>
+          Terminal with colorized output similar to real terminal applications:
+        </p>
+        <terminal-session
+          id="rich-content-terminal"
+          autoplay="true"
+        ></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Interactive Controls</h2>
+        <div class="controls">
+          <button onclick="addCustomSession()">Load Custom Session</button>
+          <button onclick="toggleTheme()">Toggle Theme</button>
+          <button onclick="changeSpeed()">Change Speed</button>
+          <button onclick="showErrorExample()">Show Error Example</button>
+          <button onclick="showRichContentExample()">Show Rich Content</button>
+          <button onclick="showTableExample()">Show Table Layout</button>
         </div>
-        <div class="feature">
-          <h3>Play Button Only</h3>
-          <terminal-session 
-            id="toolbar-play-only"
-            title="Minimal Controls"
-            show-reset-button="false"
-            show-theme-toggle="false"
-            show-window-buttons="false"
-          ></terminal-session>
+        <terminal-session
+          id="interactive-terminal"
+          autoplay="false"
+        ></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Features</h2>
+        <div class="features">
+          <div class="feature">
+            <h3>🎨 Themeable</h3>
+            <p>Light/dark themes with custom color overrides</p>
+          </div>
+          <div class="feature">
+            <h3>▶️ Playback Control</h3>
+            <p>Play, pause, and reset session recordings</p>
+          </div>
+          <div class="feature">
+            <h3>🎯 Step Types</h3>
+            <p>Command, output, error, warning, info, success</p>
+          </div>
+          <div class="feature">
+            <h3>⚡ Performant</h3>
+            <p>Built with Svelte 5 for optimal performance</p>
+          </div>
+          <div class="feature">
+            <h3>📦 Web Component</h3>
+            <p>Works with any framework or vanilla JS</p>
+          </div>
+          <div class="feature">
+            <h3>🔧 Customizable</h3>
+            <p>Configurable speed, colors, and behavior</p>
+          </div>
+          <div class="feature">
+            <h3>🎛️ Full UI Control</h3>
+            <p>
+              Show/hide header, window buttons, and control buttons individually
+            </p>
+          </div>
+          <div class="feature">
+            <h3>⌨️ Typing Effect</h3>
+            <p>Realistic typing animation with variable speed</p>
+          </div>
+          <div class="feature">
+            <h3>📑 Advanced Tabs</h3>
+            <p>Background processing, closable tabs, top/bottom position</p>
+          </div>
+          <div class="feature">
+            <h3>👁️ Smart Autoplay</h3>
+            <p>Autoplay on visibility, tab switch, or manual trigger</p>
+          </div>
+          <div class="feature">
+            <h3>🔄 State Persistence</h3>
+            <p>Tabs maintain state when switching</p>
+          </div>
+          <div class="feature">
+            <h3>🎯 Web Component</h3>
+            <p>HTML attributes with proper type conversion</p>
+          </div>
         </div>
-        <div class="feature">
-          <h3>No Header At All</h3>
-          <terminal-session 
-            id="toolbar-no-header"
-            show-header="false"
-          ></terminal-session>
+      </div>
+
+      <div class="demo-section">
+        <h2>Usage Examples</h2>
+        <div class="code-example">
+          &lt;!-- Basic terminal with custom controls --&gt;
+          &lt;terminal-session theme="dark" autoplay="true" playback-speed="1.5"
+          title="My Terminal" show-window-buttons="false"
+          show-reset-button="false" &gt;&lt;/terminal-session&gt; &lt;!--
+          Minimal terminal without header --&gt; &lt;terminal-session
+          show-header="false" autoplay="true" &gt;&lt;/terminal-session&gt;
+          &lt;!-- Tabbed terminal with bottom tabs --&gt; &lt;terminal-session
+          show-tabs="true" tab-bar-position="bottom" allow-tab-close="true"
+          &gt;&lt;/terminal-session&gt; &lt;script&gt; const terminal =
+          document.querySelector('terminal-session'); // Set a simple session
+          terminal.session = [ { type: 'command', content: 'npm install', delay:
+          500 }, { type: 'output', content: 'Installing...', delay: 1000 }, {
+          type: 'success', content: 'Done!', delay: 500 } ]; // Or set tabs for
+          multiple sessions terminal.tabs = [ { id: 'tab1', title: 'Server',
+          icon: '🖥️', session: serverSession, closable: true }, { id: 'tab2',
+          title: 'Tests', icon: '🧪', session: testSession } ]; &lt;/script&gt;
         </div>
       </div>
     </div>
 
-    <div class="demo-section">
-      <h2>Tabbed Terminal with Background Processing</h2>
-      <p>Tabs continue processing in the background when you switch between them:</p>
-      <terminal-session 
-        id="tabbed-terminal"
-        show-tabs="true"
-        allow-tab-close="true"
-        tab-bar-position="top"
-        playback-speed="1.5"
-      ></terminal-session>
-      <p style="color: #666; font-size: 14px; margin-top: 10px;">
-        💡 Try switching between tabs - they continue running in the background!
-      </p>
-    </div>
-    
-    <div class="demo-section">
-      <h2>Minimal Tabbed Terminal</h2>
-      <p>Tabs below header without any control buttons for a clean interface:</p>
-      <terminal-session 
-        id="tabbed-minimal"
-        show-tabs="true"
-        show-play-button="false"
-        show-reset-button="false"
-        show-theme-toggle="false"
-        show-window-buttons="false"
-        allow-tab-close="true"
-        tab-bar-position="top"
-      ></terminal-session>
-    </div>
-    
-    <div class="demo-section">
-      <h2>Completely Minimal - No Toolbar</h2>
-      <p>Terminal without any header or controls, just the content:</p>
-      <terminal-session 
-        id="minimal-no-toolbar"
-        show-header="false"
-        theme="dark"
-        autoplay="true"
-      ></terminal-session>
-      <p style="color: #666; font-size: 14px; margin-top: 10px;">
-        💡 Perfect for embedding in documentation or tutorials
-      </p>
-    </div>
+    <script type="module">
+      // Debug information for GitHub Pages deployment
+      console.log("🔍 Debug Info:");
+      console.log("Current URL:", window.location.href);
+      console.log(
+        "Base URL:",
+        window.location.origin + window.location.pathname
+      );
 
-    <div class="demo-section">
-      <h2>Rich Text Colorization</h2>
-      <p>Terminal with colorized output similar to real terminal applications:</p>
-      <terminal-session id="rich-content-terminal" autoplay="true"></terminal-session>
-    </div>
+      // Try ES module first, fallback to UMD if it fails
+      try {
+        console.log("📦 Attempting to load ES module...");
+        await import("./dist/terminal-session.es.js");
+        console.log("✅ ES module loaded successfully");
+      } catch (error) {
+        console.warn(
+          "⚠️ ES module failed, loading UMD fallback:",
+          error.message
+        );
 
-    <div class="demo-section">
-      <h2>Interactive Controls</h2>
-      <div class="controls">
-        <button onclick="addCustomSession()">Load Custom Session</button>
-        <button onclick="toggleTheme()">Toggle Theme</button>
-        <button onclick="changeSpeed()">Change Speed</button>
-        <button onclick="showErrorExample()">Show Error Example</button>
-        <button onclick="showRichContentExample()">Show Rich Content</button>
-      </div>
-      <terminal-session id="interactive-terminal" autoplay="false"></terminal-session>
-    </div>
+        // Fallback to UMD version
+        console.log("📦 Attempting to load UMD module...");
+        const script = document.createElement("script");
+        script.src = "./dist/terminal-session.umd.js";
+        script.onload = () => {
+          console.log("✅ UMD module loaded successfully");
+          console.log(
+            "Available globals:",
+            Object.keys(window).filter((key) => key.includes("Terminal"))
+          );
+        };
+        script.onerror = (err) => {
+          console.error("❌ UMD module also failed to load:", err);
+          console.log(
+            "🔧 Please check if dist/terminal-session.umd.js exists and is accessible"
+          );
+        };
+        document.head.appendChild(script);
+      }
 
-    <div class="demo-section">
-      <h2>Features</h2>
-      <div class="features">
-        <div class="feature">
-          <h3>🎨 Themeable</h3>
-          <p>Light/dark themes with custom color overrides</p>
-        </div>
-        <div class="feature">
-          <h3>▶️ Playback Control</h3>
-          <p>Play, pause, and reset session recordings</p>
-        </div>
-        <div class="feature">
-          <h3>🎯 Step Types</h3>
-          <p>Command, output, error, warning, info, success</p>
-        </div>
-        <div class="feature">
-          <h3>⚡ Performant</h3>
-          <p>Built with Svelte 5 for optimal performance</p>
-        </div>
-        <div class="feature">
-          <h3>📦 Web Component</h3>
-          <p>Works with any framework or vanilla JS</p>
-        </div>
-        <div class="feature">
-          <h3>🔧 Customizable</h3>
-          <p>Configurable speed, colors, and behavior</p>
-        </div>
-        <div class="feature">
-          <h3>🎛️ Full UI Control</h3>
-          <p>Show/hide header, window buttons, and control buttons individually</p>
-        </div>
-        <div class="feature">
-          <h3>⌨️ Typing Effect</h3>
-          <p>Realistic typing animation with variable speed</p>
-        </div>
-        <div class="feature">
-          <h3>📑 Advanced Tabs</h3>
-          <p>Background processing, closable tabs, top/bottom position</p>
-        </div>
-        <div class="feature">
-          <h3>👁️ Smart Autoplay</h3>
-          <p>Autoplay on visibility, tab switch, or manual trigger</p>
-        </div>
-        <div class="feature">
-          <h3>🔄 State Persistence</h3>
-          <p>Tabs maintain state when switching</p>
-        </div>
-        <div class="feature">
-          <h3>🎯 Web Component</h3>
-          <p>HTML attributes with proper type conversion</p>
-        </div>
-      </div>
-    </div>
+      // Basic terminal session
+      const basicSession = [
+        { type: "command", content: "git status", delay: 500 },
+        {
+          type: "output",
+          content:
+            "On branch main\nYour branch is up to date with 'origin/main'.\n\nChanges not staged for commit:",
+          delay: 800,
+        },
+        {
+          type: "warning",
+          content:
+            "  modified:   src/components/Header.jsx\n  modified:   src/styles/main.css",
+          delay: 600,
+        },
+        { type: "command", content: "git add .", delay: 1000 },
+        {
+          type: "command",
+          content: 'git commit -m "Update header styling"',
+          delay: 800,
+        },
+        {
+          type: "output",
+          content: "[main 3a4f5b6] Update header styling",
+          delay: 500,
+        },
+        {
+          type: "success",
+          content: " 2 files changed, 24 insertions(+), 8 deletions(-)",
+          delay: 400,
+        },
+        { type: "command", content: "git push origin main", delay: 1000 },
+        {
+          type: "output",
+          content:
+            "Enumerating objects: 7, done.\nCounting objects: 100% (7/7), done.\nDelta compression using up to 8 threads\nCompressing objects: 100% (4/4), done.\nWriting objects: 100% (4/4), 512 bytes | 512.00 KiB/s, done.",
+          delay: 1200,
+        },
+        {
+          type: "success",
+          content:
+            "To github.com:user/repo.git\n   2b3c4d5..3a4f5b6  main -> main",
+          delay: 500,
+        },
+      ];
 
-    <div class="demo-section">
-      <h2>Usage Examples</h2>
-      <div class="code-example">
-&lt;!-- Basic terminal with custom controls --&gt;
-&lt;terminal-session
-  theme="dark"
-  autoplay="true"
-  playback-speed="1.5"
-  title="My Terminal"
-  show-window-buttons="false"
-  show-reset-button="false"
-&gt;&lt;/terminal-session&gt;
+      // Set sessions but don't autoplay all at once to prevent performance issues
+      document.getElementById("basic-terminal").session = basicSession;
+      document.getElementById("basic-terminal").autoplay = false;
 
-&lt;!-- Minimal terminal without header --&gt;
-&lt;terminal-session
-  show-header="false"
-  autoplay="true"
-&gt;&lt;/terminal-session&gt;
+      document.getElementById("light-terminal").session = basicSession;
+      document.getElementById("light-terminal").autoplay = false;
 
-&lt;!-- Tabbed terminal with bottom tabs --&gt;
-&lt;terminal-session
-  show-tabs="true"
-  tab-bar-position="bottom"
-  allow-tab-close="true"
-&gt;&lt;/terminal-session&gt;
+      // Toolbar demo terminals
+      document.getElementById("toolbar-no-window").session = basicSession;
+      document.getElementById("toolbar-no-controls").session = basicSession;
+      document.getElementById("toolbar-play-only").session = basicSession;
+      document.getElementById("toolbar-no-header").session = basicSession;
 
-&lt;script&gt;
-  const terminal = document.querySelector('terminal-session');
-  
-  // Set a simple session
-  terminal.session = [
-    { type: 'command', content: 'npm install', delay: 500 },
-    { type: 'output', content: 'Installing...', delay: 1000 },
-    { type: 'success', content: 'Done!', delay: 500 }
-  ];
-  
-  // Or set tabs for multiple sessions
-  terminal.tabs = [
-    {
-      id: 'tab1',
-      title: 'Server',
-      icon: '🖥️',
-      session: serverSession,
-      closable: true
-    },
-    {
-      id: 'tab2',
-      title: 'Tests',
-      icon: '🧪',
-      session: testSession
-    }
-  ];
-&lt;/script&gt;
-      </div>
-    </div>
-  </div>
+      // Tabbed terminal setup
+      const tabbedTerminal = document.getElementById("tabbed-terminal");
+      tabbedTerminal.tabs = [
+        {
+          id: "git-tab",
+          title: "Git Workflow",
+          icon: "📦",
+          session: basicSession,
+          closable: true,
+          status: "success",
+        },
+        {
+          id: "build-tab",
+          title: "Build Process",
+          icon: "🔨",
+          session: [
+            { type: "command", content: "npm run build", delay: 500 },
+            { type: "output", content: "> vite build", delay: 600 },
+            {
+              type: "info",
+              content: "vite v5.0.0 building for production...",
+              delay: 800,
+            },
+            { type: "output", content: "transforming (142)...", delay: 1000 },
+            {
+              type: "output",
+              content: "✓ 142 modules transformed.",
+              delay: 1200,
+            },
+            {
+              type: "success",
+              content: "build completed in 2.14s",
+              delay: 500,
+            },
+          ],
+          closable: true,
+          badge: 3,
+          status: "running",
+        },
+        {
+          id: "test-tab",
+          title: "Tests",
+          icon: "🧪",
+          session: [
+            { type: "command", content: "npm test", delay: 500 },
+            { type: "output", content: "Running test suite...", delay: 800 },
+            {
+              type: "success",
+              content: "✓ Authentication tests passed (5/5)",
+              delay: 600,
+            },
+            {
+              type: "success",
+              content: "✓ API tests passed (12/12)",
+              delay: 600,
+            },
+            { type: "error", content: "✗ UI tests failed (2/10)", delay: 600 },
+            {
+              type: "warning",
+              content: "Total: 17 passed, 2 failed",
+              delay: 500,
+            },
+          ],
+          closable: false,
+          status: "error",
+        },
+        {
+          id: "logs-tab",
+          title: "Server Logs",
+          icon: "📋",
+          session: [
+            {
+              type: "info",
+              content: "[2024-01-15 10:23:45] Server started on port 3000",
+              delay: 300,
+            },
+            {
+              type: "output",
+              content: "[2024-01-15 10:23:46] Database connected",
+              delay: 400,
+            },
+            {
+              type: "warning",
+              content:
+                "[2024-01-15 10:23:47] Deprecation warning: Using old API",
+              delay: 500,
+            },
+            {
+              type: "success",
+              content: "[2024-01-15 10:23:48] All services initialized",
+              delay: 400,
+            },
+            {
+              type: "output",
+              content: "[2024-01-15 10:23:49] Listening for connections...",
+              delay: 500,
+            },
+          ],
+          closable: true,
+          status: "idle",
+        },
+      ];
 
-  <script type="module">
-    // Debug information for GitHub Pages deployment
-    console.log('🔍 Debug Info:');
-    console.log('Current URL:', window.location.href);
-    console.log('Base URL:', window.location.origin + window.location.pathname);
-    
-    // Try ES module first, fallback to UMD if it fails
-    try {
-      console.log('📦 Attempting to load ES module...');
-      await import('./dist/terminal-session.es.js');
-      console.log('✅ ES module loaded successfully');
-    } catch (error) {
-      console.warn('⚠️ ES module failed, loading UMD fallback:', error.message);
-      
-      // Fallback to UMD version
-      console.log('📦 Attempting to load UMD module...');
-      const script = document.createElement('script');
-      script.src = './dist/terminal-session.umd.js';
-      script.onload = () => {
-        console.log('✅ UMD module loaded successfully');
-        console.log('Available globals:', Object.keys(window).filter(key => key.includes('Terminal')));
+      // Minimal tabbed terminal
+      const minimalTabbed = document.getElementById("tabbed-minimal");
+      if (minimalTabbed) {
+        minimalTabbed.tabs = [
+          {
+            id: "minimal-1",
+            title: "Process 1",
+            icon: "1️⃣",
+            session: [
+              { type: "command", content: "docker-compose up", delay: 500 },
+              {
+                type: "output",
+                content: 'Creating network "app_default"',
+                delay: 600,
+              },
+              {
+                type: "output",
+                content: 'Creating volume "app_data"',
+                delay: 700,
+              },
+              {
+                type: "info",
+                content: "Starting database container...",
+                delay: 800,
+              },
+              {
+                type: "success",
+                content: "Database is ready for connections",
+                delay: 1000,
+              },
+              {
+                type: "info",
+                content: "Starting application container...",
+                delay: 800,
+              },
+              {
+                type: "success",
+                content: "Application started on port 3000",
+                delay: 900,
+              },
+            ],
+            closable: true,
+          },
+          {
+            id: "minimal-2",
+            title: "Process 2",
+            icon: "2️⃣",
+            session: [
+              { type: "command", content: "npm run dev", delay: 500 },
+              {
+                type: "output",
+                content: "Starting development server...",
+                delay: 700,
+              },
+              {
+                type: "info",
+                content: "Vite v5.0.0 dev server running at:",
+                delay: 600,
+              },
+              { type: "success", content: "http://localhost:5173", delay: 400 },
+              { type: "output", content: "ready in 523ms", delay: 500 },
+            ],
+            closable: true,
+          },
+          {
+            id: "minimal-3",
+            title: "Process 3",
+            icon: "3️⃣",
+            session: [
+              { type: "command", content: "npm run test:watch", delay: 500 },
+              {
+                type: "output",
+                content: "Watching for file changes...",
+                delay: 800,
+              },
+              { type: "success", content: "✓ 15 tests passed", delay: 1200 },
+              {
+                type: "info",
+                content: "Waiting for file changes...",
+                delay: 600,
+              },
+            ],
+            closable: false,
+          },
+        ];
+      }
+
+      // Minimal no-toolbar terminal
+      const minimalNoToolbar = document.getElementById("minimal-no-toolbar");
+      if (minimalNoToolbar) {
+        minimalNoToolbar.session = [
+          {
+            type: "command",
+            content: "curl -X GET https://api.example.com/data",
+            delay: 500,
+          },
+          {
+            type: "output",
+            content: '{"status": "success", "data": {',
+            delay: 600,
+          },
+          { type: "output", content: '  "users": 1247,', delay: 400 },
+          { type: "output", content: '  "active": true,', delay: 400 },
+          {
+            type: "output",
+            content: '  "timestamp": "2024-01-15T10:30:00Z"',
+            delay: 400,
+          },
+          { type: "output", content: "}}", delay: 300 },
+          {
+            type: "command",
+            content: 'echo "API call successful"',
+            delay: 800,
+          },
+          { type: "success", content: "API call successful", delay: 500 },
+        ];
+      }
+
+      // Custom colors terminal
+      const customTerminal = document.getElementById("custom-terminal");
+      customTerminal.session = basicSession;
+      customTerminal.colors = {
+        background: "#1e1e2e",
+        foreground: "#cdd6f4",
+        prompt: "#89b4fa",
+        command: "#94e2d5",
+        success: "#a6e3a1",
+        warning: "#f9e2af",
+        error: "#f38ba8",
       };
-      script.onerror = (err) => {
-        console.error('❌ UMD module also failed to load:', err);
-        console.log('🔧 Please check if dist/terminal-session.umd.js exists and is accessible');
+      customTerminal.autoplay = false;
+
+      // Only autoplay the first visible terminal to prevent performance issues
+      // Use Intersection Observer to play terminals when they come into view
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const terminal = entry.target;
+              if (
+                terminal.session &&
+                terminal.session.length > 0 &&
+                !terminal.hasPlayed
+              ) {
+                terminal.hasPlayed = true;
+                terminal.autoplay = true;
+              }
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
+
+      // Observe all terminals except the interactive one
+      observer.observe(document.getElementById("basic-terminal"));
+      observer.observe(document.getElementById("light-terminal"));
+      observer.observe(document.getElementById("custom-terminal"));
+      observer.observe(document.getElementById("toolbar-no-window"));
+      observer.observe(document.getElementById("toolbar-play-only"));
+      observer.observe(document.getElementById("toolbar-no-header"));
+      if (document.getElementById("minimal-no-toolbar")) {
+        observer.observe(document.getElementById("minimal-no-toolbar"));
+      }
+
+      // Rich content terminal - API Validator Table Example
+      const richContentTerminal = document.getElementById(
+        "rich-content-terminal"
+      );
+      richContentTerminal.session = [
+        {
+          type: "command",
+          content: [
+            { text: "➜ ", color: "#cd3131", fontWeight: "bold" },
+            {
+              text: "api-metadata-validator",
+              color: "#0598bc",
+              fontWeight: "bold",
+            },
+            { text: " git:(", color: "#0451a5", fontWeight: "bold" },
+            {
+              text: "feat/landing-redesign",
+              color: "#cd3131",
+              fontWeight: "bold",
+            },
+            { text: ") ", color: "#0451a5", fontWeight: "bold" },
+            { text: "✗", color: "#949800", fontWeight: "bold" },
+            { text: " api-metadata-validator ./petstore.v3.yaml" },
+          ],
+          delay: 500,
+        },
+        {
+          type: "output",
+          content:
+            '> @sap/api-metadata-validator@3.22.0 start\n> ts-node ./src/cli.ts -r sap:core:v1 "./examples/valid/*.json" ./petstore.v3.yaml',
+          delay: 800,
+        },
+        {
+          type: "output",
+          content: [
+            {
+              text: "API Metadata Validator v3.22.0",
+              backgroundColor: "#bfbfbf",
+              color: "#000000",
+              fontWeight: "bold",
+            },
+          ],
+          delay: 600,
+        },
+        {
+          type: "output",
+          content: [
+            {
+              text: "/Users/Validator/api-metadata-validator/petstore.v3.yaml",
+              textDecoration: "underline",
+            },
+            { text: " [compliance-level: " },
+            {
+              text: "sap:core:v1",
+              fontWeight: "bold",
+              textDecoration: "underline",
+            },
+            { text: ", overrides-detected: " },
+            { text: "No", color: "#cd3131", fontWeight: "bold" },
+            { text: "]" },
+          ],
+          delay: 400,
+        },
+        {
+          type: "output",
+          content: [
+            // Full API validator table output
+            {
+              text: "1:1",
+              isTableRow: true,
+              tableColumn: "position",
+              columnGap: "10px",
+              rowGap: "6px",
+            },
+            { text: "error", color: "#cd3131", tableColumn: "type" },
+            {
+              text: "sap-oas-short-text",
+              textDecoration: "underline",
+              tableColumn: "rule",
+            },
+            {
+              text: "A short description in the `x-sap-shortText` field is missing.",
+              tableColumn: "message",
+            },
+
+            { text: "4:10", isTableRow: true, tableColumn: "position" },
+            { text: "warning", color: "#949800", tableColumn: "type" },
+            {
+              text: "sap-oas-title-chars",
+              textDecoration: "underline",
+              tableColumn: "rule",
+            },
+            {
+              text: "The API name should use the allowed charset and not contain version number, and operation words like create, read, delete, and update.",
+              tableColumn: "message",
+            },
+
+            { text: "", isTableRow: true, tableColumn: "position" },
+            { text: "", tableColumn: "type" },
+            { text: "", tableColumn: "rule" },
+            { text: "info.title", tableColumn: "message" },
+
+            { text: "10:9", isTableRow: true, tableColumn: "position" },
+            { text: "information", color: "#0451a5", tableColumn: "type" },
+            {
+              text: "sap-oas3-sandbox",
+              textDecoration: "underline",
+              tableColumn: "rule",
+            },
+            {
+              text: "The sandbox definition is missing.",
+              tableColumn: "message",
+            },
+
+            { text: "", isTableRow: true, tableColumn: "position" },
+            { text: "", tableColumn: "type" },
+            { text: "", tableColumn: "rule" },
+            { text: "servers", tableColumn: "message" },
+
+            { text: "14:9", isTableRow: true, tableColumn: "position" },
+            { text: "error", color: "#cd3131", tableColumn: "type" },
+            {
+              text: "sap-oas-operation-summary",
+              textDecoration: "underline",
+              tableColumn: "rule",
+            },
+            {
+              text: "A short summary of the operation must appear in each operation's line",
+              tableColumn: "message",
+            },
+
+            { text: "", isTableRow: true, tableColumn: "position" },
+            { text: "", tableColumn: "type" },
+            { text: "", tableColumn: "rule" },
+            { text: "paths./pets.get", tableColumn: "message" },
+          ],
+          delay: 500,
+        },
+        {
+          type: "error",
+          content: [
+            {
+              text: "✖ 4 problems (2 errors, 1 warning, 1 info)",
+              color: "#cd3131",
+              fontWeight: "bold",
+            },
+          ],
+          delay: 800,
+        },
+      ];
+
+      // Interactive terminal
+      const interactiveTerminal = document.getElementById(
+        "interactive-terminal"
+      );
+      interactiveTerminal.session = [
+        {
+          type: "info",
+          content: "Welcome to the interactive terminal demo!",
+          delay: 500,
+        },
+        { type: "command", content: 'echo "Hello, World!"', delay: 800 },
+        { type: "output", content: "Hello, World!", delay: 500 },
+      ];
+
+      // Interactive functions
+      window.addCustomSession = function () {
+        interactiveTerminal.session = [
+          { type: "command", content: "npm run build", delay: 500 },
+          {
+            type: "output",
+            content: "> svelte-terminal@1.0.0 build\n> vite build",
+            delay: 800,
+          },
+          {
+            type: "info",
+            content: "vite v5.0.0 building for production...",
+            delay: 600,
+          },
+          { type: "output", content: "✓ 42 modules transformed.", delay: 1000 },
+          {
+            type: "success",
+            content:
+              "dist/index.html        0.45 kB\ndist/assets/index.css  1.23 kB\ndist/assets/index.js   8.76 kB",
+            delay: 800,
+          },
+          { type: "success", content: "✓ built in 1.23s", delay: 500 },
+        ];
+        interactiveTerminal.autoplay = true;
       };
-      document.head.appendChild(script);
-    }
 
-    // Basic terminal session
-    const basicSession = [
-      { type: 'command', content: 'git status', delay: 500 },
-      { type: 'output', content: 'On branch main\nYour branch is up to date with \'origin/main\'.\n\nChanges not staged for commit:', delay: 800 },
-      { type: 'warning', content: '  modified:   src/components/Header.jsx\n  modified:   src/styles/main.css', delay: 600 },
-      { type: 'command', content: 'git add .', delay: 1000 },
-      { type: 'command', content: 'git commit -m "Update header styling"', delay: 800 },
-      { type: 'output', content: '[main 3a4f5b6] Update header styling', delay: 500 },
-      { type: 'success', content: ' 2 files changed, 24 insertions(+), 8 deletions(-)', delay: 400 },
-      { type: 'command', content: 'git push origin main', delay: 1000 },
-      { type: 'output', content: 'Enumerating objects: 7, done.\nCounting objects: 100% (7/7), done.\nDelta compression using up to 8 threads\nCompressing objects: 100% (4/4), done.\nWriting objects: 100% (4/4), 512 bytes | 512.00 KiB/s, done.', delay: 1200 },
-      { type: 'success', content: 'To github.com:user/repo.git\n   2b3c4d5..3a4f5b6  main -> main', delay: 500 }
-    ];
+      window.toggleTheme = function () {
+        const current = interactiveTerminal.theme;
+        interactiveTerminal.theme = current === "dark" ? "light" : "dark";
+      };
 
-    // Set sessions but don't autoplay all at once to prevent performance issues
-    document.getElementById('basic-terminal').session = basicSession;
-    document.getElementById('basic-terminal').autoplay = false;
+      window.changeSpeed = function () {
+        const speeds = [0.5, 1, 1.5, 2];
+        const current = interactiveTerminal.playbackSpeed || 1;
+        const currentIndex = speeds.indexOf(current);
+        const nextIndex = (currentIndex + 1) % speeds.length;
+        interactiveTerminal.playbackSpeed = speeds[nextIndex];
+        alert(`Playback speed set to ${speeds[nextIndex]}x`);
+      };
 
-    document.getElementById('light-terminal').session = basicSession;
-    document.getElementById('light-terminal').autoplay = false;
-    
-    // Toolbar demo terminals
-    document.getElementById('toolbar-no-window').session = basicSession;
-    document.getElementById('toolbar-no-controls').session = basicSession;
-    document.getElementById('toolbar-play-only').session = basicSession;
-    document.getElementById('toolbar-no-header').session = basicSession;
-    
-    // Tabbed terminal setup
-    const tabbedTerminal = document.getElementById('tabbed-terminal');
-    tabbedTerminal.tabs = [
-      {
-        id: 'git-tab',
-        title: 'Git Workflow',
-        icon: '📦',
-        session: basicSession,
-        closable: true,
-        status: 'success'
-      },
-      {
-        id: 'build-tab',
-        title: 'Build Process',
-        icon: '🔨',
-        session: [
-          { type: 'command', content: 'npm run build', delay: 500 },
-          { type: 'output', content: '> vite build', delay: 600 },
-          { type: 'info', content: 'vite v5.0.0 building for production...', delay: 800 },
-          { type: 'output', content: 'transforming (142)...', delay: 1000 },
-          { type: 'output', content: '✓ 142 modules transformed.', delay: 1200 },
-          { type: 'success', content: 'build completed in 2.14s', delay: 500 }
-        ],
-        closable: true,
-        badge: 3,
-        status: 'running'
-      },
-      {
-        id: 'test-tab',
-        title: 'Tests',
-        icon: '🧪',
-        session: [
-          { type: 'command', content: 'npm test', delay: 500 },
-          { type: 'output', content: 'Running test suite...', delay: 800 },
-          { type: 'success', content: '✓ Authentication tests passed (5/5)', delay: 600 },
-          { type: 'success', content: '✓ API tests passed (12/12)', delay: 600 },
-          { type: 'error', content: '✗ UI tests failed (2/10)', delay: 600 },
-          { type: 'warning', content: 'Total: 17 passed, 2 failed', delay: 500 }
-        ],
-        closable: false,
-        status: 'error'
-      },
-      {
-        id: 'logs-tab',
-        title: 'Server Logs',
-        icon: '📋',
-        session: [
-          { type: 'info', content: '[2024-01-15 10:23:45] Server started on port 3000', delay: 300 },
-          { type: 'output', content: '[2024-01-15 10:23:46] Database connected', delay: 400 },
-          { type: 'warning', content: '[2024-01-15 10:23:47] Deprecation warning: Using old API', delay: 500 },
-          { type: 'success', content: '[2024-01-15 10:23:48] All services initialized', delay: 400 },
-          { type: 'output', content: '[2024-01-15 10:23:49] Listening for connections...', delay: 500 }
-        ],
-        closable: true,
-        status: 'idle'
-      }
-    ];
-    
-    // Minimal tabbed terminal
-    const minimalTabbed = document.getElementById('tabbed-minimal');
-    if (minimalTabbed) {
-      minimalTabbed.tabs = [
-        {
-          id: 'minimal-1',
-          title: 'Process 1',
-          icon: '1️⃣',
-          session: [
-            { type: 'command', content: 'docker-compose up', delay: 500 },
-            { type: 'output', content: 'Creating network "app_default"', delay: 600 },
-            { type: 'output', content: 'Creating volume "app_data"', delay: 700 },
-            { type: 'info', content: 'Starting database container...', delay: 800 },
-            { type: 'success', content: 'Database is ready for connections', delay: 1000 },
-            { type: 'info', content: 'Starting application container...', delay: 800 },
-            { type: 'success', content: 'Application started on port 3000', delay: 900 }
-          ],
-          closable: true
-        },
-        {
-          id: 'minimal-2',
-          title: 'Process 2',
-          icon: '2️⃣',
-          session: [
-            { type: 'command', content: 'npm run dev', delay: 500 },
-            { type: 'output', content: 'Starting development server...', delay: 700 },
-            { type: 'info', content: 'Vite v5.0.0 dev server running at:', delay: 600 },
-            { type: 'success', content: 'http://localhost:5173', delay: 400 },
-            { type: 'output', content: 'ready in 523ms', delay: 500 }
-          ],
-          closable: true
-        },
-        {
-          id: 'minimal-3',
-          title: 'Process 3',
-          icon: '3️⃣',
-          session: [
-            { type: 'command', content: 'npm run test:watch', delay: 500 },
-            { type: 'output', content: 'Watching for file changes...', delay: 800 },
-            { type: 'success', content: '✓ 15 tests passed', delay: 1200 },
-            { type: 'info', content: 'Waiting for file changes...', delay: 600 }
-          ],
-          closable: false
-        }
-      ];
-    }
+      window.showErrorExample = function () {
+        interactiveTerminal.session = [
+          { type: "command", content: "npm test", delay: 500 },
+          {
+            type: "output",
+            content: "> svelte-terminal@1.0.0 test\n> vitest",
+            delay: 800,
+          },
+          {
+            type: "error",
+            content: "FAIL  src/components/Terminal.test.js",
+            delay: 600,
+          },
+          {
+            type: "error",
+            content:
+              "  ● Terminal › should render without errors\n\n    TypeError: Cannot read property 'theme' of undefined",
+            delay: 800,
+          },
+          {
+            type: "output",
+            content:
+              "\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total",
+            delay: 600,
+          },
+          {
+            type: "error",
+            content: "npm ERR! Test failed. See above for more details.",
+            delay: 500,
+          },
+        ];
+        interactiveTerminal.autoplay = true;
+      };
 
-    // Minimal no-toolbar terminal
-    const minimalNoToolbar = document.getElementById('minimal-no-toolbar');
-    if (minimalNoToolbar) {
-      minimalNoToolbar.session = [
-        { type: 'command', content: 'curl -X GET https://api.example.com/data', delay: 500 },
-        { type: 'output', content: '{"status": "success", "data": {', delay: 600 },
-        { type: 'output', content: '  "users": 1247,', delay: 400 },
-        { type: 'output', content: '  "active": true,', delay: 400 },
-        { type: 'output', content: '  "timestamp": "2024-01-15T10:30:00Z"', delay: 400 },
-        { type: 'output', content: '}}', delay: 300 },
-        { type: 'command', content: 'echo "API call successful"', delay: 800 },
-        { type: 'success', content: 'API call successful', delay: 500 }
-      ];
-    }
+      window.showRichContentExample = function () {
+        interactiveTerminal.session = [
+          {
+            type: "command",
+            content: [
+              { text: "git", color: "#569cd6", fontWeight: "bold" },
+              { text: " log ", color: "#ffffff" },
+              { text: "--oneline", color: "#ce9178" },
+            ],
+            delay: 500,
+          },
+          {
+            type: "output",
+            content: [
+              { text: "a1b2c3d", color: "#dcdcaa", fontWeight: "bold" },
+              { text: " feat: add rich text support (", color: "#ffffff" },
+              { text: "HEAD -> ", color: "#569cd6" },
+              { text: "main", color: "#4ec9b0", fontWeight: "bold" },
+              { text: ")", color: "#ffffff" },
+            ],
+            delay: 600,
+          },
+          {
+            type: "output",
+            content: [
+              { text: "e4f5g6h", color: "#dcdcaa", fontWeight: "bold" },
+              { text: " fix: typing animation issues", color: "#ffffff" },
+            ],
+            delay: 400,
+          },
+          {
+            type: "output",
+            content: [
+              { text: "i7j8k9l", color: "#dcdcaa", fontWeight: "bold" },
+              { text: " docs: update examples", color: "#ffffff" },
+            ],
+            delay: 400,
+          },
+        ];
+        interactiveTerminal.autoplay = true;
+      };
 
-    // Custom colors terminal
-    const customTerminal = document.getElementById('custom-terminal');
-    customTerminal.session = basicSession;
-    customTerminal.colors = {
-      background: '#1e1e2e',
-      foreground: '#cdd6f4',
-      prompt: '#89b4fa',
-      command: '#94e2d5',
-      success: '#a6e3a1',
-      warning: '#f9e2af',
-      error: '#f38ba8'
-    };
-    customTerminal.autoplay = false;
-    
-    // Only autoplay the first visible terminal to prevent performance issues
-    // Use Intersection Observer to play terminals when they come into view
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const terminal = entry.target;
-          if (terminal.session && terminal.session.length > 0 && !terminal.hasPlayed) {
-            terminal.hasPlayed = true;
-            terminal.autoplay = true;
-          }
-        }
-      });
-    }, { threshold: 0.5 });
-
-    // Observe all terminals except the interactive one
-    observer.observe(document.getElementById('basic-terminal'));
-    observer.observe(document.getElementById('light-terminal'));
-    observer.observe(document.getElementById('custom-terminal'));
-    observer.observe(document.getElementById('toolbar-no-window'));
-    observer.observe(document.getElementById('toolbar-play-only'));
-    observer.observe(document.getElementById('toolbar-no-header'));
-    if (document.getElementById('minimal-no-toolbar')) {
-      observer.observe(document.getElementById('minimal-no-toolbar'));
-    }
-
-    // Rich content terminal
-    const richContentTerminal = document.getElementById('rich-content-terminal');
-    richContentTerminal.session = [
-      { 
-        type: 'command', 
-        content: [
-          { text: '➜ ', color: '#cd3131', fontWeight: 'bold' },
-          { text: 'api-validator', color: '#0598bc', fontWeight: 'bold' },
-          { text: ' git:(', color: '#0451a5', fontWeight: 'bold' },
-          { text: 'feat/landing-redesign', color: '#cd3131', fontWeight: 'bold' },
-          { text: ') ', color: '#0451a5', fontWeight: 'bold' },
-          { text: '✗', color: '#949800', fontWeight: 'bold' },
-          { text: ' npm run start -- ./petstore.v3.yaml' }
-        ],
-        delay: 500
-      },
-      { 
-        type: 'output', 
-        content: '> @sap/api-metadata-validator@3.22.0 start\n> ts-node ./src/cli.ts -r sap:core:v1 "./examples/valid/*.json" ./petstore.v3.yaml',
-        delay: 800 
-      },
-      {
-        type: 'output',
-        content: [
-          { text: 'SAP API Metadata Validator v3.22.0', backgroundColor: '#bfbfbf', color: '#000000', fontWeight: 'bold' }
-        ],
-        delay: 600
-      },
-      {
-        type: 'output',
-        content: [
-          { text: '/Users/dev/petstore.v3.yaml', textDecoration: 'underline' },
-          { text: ' [compliance-level: ' },
-          { text: 'sap:core:v1', fontWeight: 'bold', textDecoration: 'underline' },
-          { text: ', overrides-detected: ' },
-          { text: 'No', color: '#cd3131', fontWeight: 'bold' },
-          { text: ']' }
-        ],
-        delay: 400
-      },
-      {
-        type: 'output',
-        content: [
-          { text: '1:1 ' },
-          { text: 'error', color: '#cd3131' },
-          { text: ' ' },
-          { text: 'sap-oas-short-text', textDecoration: 'underline' },
-          { text: ' A short description in the `x-sap-shortText` field is missing.' }
-        ],
-        delay: 500
-      },
-      {
-        type: 'output',
-        content: [
-          { text: '4:10 ' },
-          { text: 'warning', color: '#949800' },
-          { text: ' ' },
-          { text: 'sap-oas-title-chars', textDecoration: 'underline' },
-          { text: ' The API name should use the allowed charset.' }
-        ],
-        delay: 500
-      },
-      {
-        type: 'output',
-        content: [
-          { text: '10:9 ' },
-          { text: 'information', color: '#0451a5' },
-          { text: ' ' },
-          { text: 'sap-oas3-sandbox', textDecoration: 'underline' },
-          { text: ' The sandbox definition is missing.' }
-        ],
-        delay: 500
-      },
-      {
-        type: 'error',
-        content: [
-          { text: '✖ 4 problems (2 errors, 1 warning, 1 info)', color: '#cd3131', fontWeight: 'bold' }
-        ],
-        delay: 800
-      }
-    ];
-
-    // Interactive terminal
-    const interactiveTerminal = document.getElementById('interactive-terminal');
-    interactiveTerminal.session = [
-      { type: 'info', content: 'Welcome to the interactive terminal demo!', delay: 500 },
-      { type: 'command', content: 'echo "Hello, World!"', delay: 800 },
-      { type: 'output', content: 'Hello, World!', delay: 500 }
-    ];
-
-    // Interactive functions
-    window.addCustomSession = function() {
-      interactiveTerminal.session = [
-        { type: 'command', content: 'npm run build', delay: 500 },
-        { type: 'output', content: '> svelte-terminal@1.0.0 build\n> vite build', delay: 800 },
-        { type: 'info', content: 'vite v5.0.0 building for production...', delay: 600 },
-        { type: 'output', content: '✓ 42 modules transformed.', delay: 1000 },
-        { type: 'success', content: 'dist/index.html        0.45 kB\ndist/assets/index.css  1.23 kB\ndist/assets/index.js   8.76 kB', delay: 800 },
-        { type: 'success', content: '✓ built in 1.23s', delay: 500 }
-      ];
-      interactiveTerminal.autoplay = true;
-    };
-
-    window.toggleTheme = function() {
-      const current = interactiveTerminal.theme;
-      interactiveTerminal.theme = current === 'dark' ? 'light' : 'dark';
-    };
-
-    window.changeSpeed = function() {
-      const speeds = [0.5, 1, 1.5, 2];
-      const current = interactiveTerminal.playbackSpeed || 1;
-      const currentIndex = speeds.indexOf(current);
-      const nextIndex = (currentIndex + 1) % speeds.length;
-      interactiveTerminal.playbackSpeed = speeds[nextIndex];
-      alert(`Playback speed set to ${speeds[nextIndex]}x`);
-    };
-
-    window.showErrorExample = function() {
-      interactiveTerminal.session = [
-        { type: 'command', content: 'npm test', delay: 500 },
-        { type: 'output', content: '> svelte-terminal@1.0.0 test\n> vitest', delay: 800 },
-        { type: 'error', content: 'FAIL  src/components/Terminal.test.js', delay: 600 },
-        { type: 'error', content: '  ● Terminal › should render without errors\n\n    TypeError: Cannot read property \'theme\' of undefined', delay: 800 },
-        { type: 'output', content: '\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total', delay: 600 },
-        { type: 'error', content: 'npm ERR! Test failed. See above for more details.', delay: 500 }
-      ];
-      interactiveTerminal.autoplay = true;
-    };
-
-    window.showRichContentExample = function() {
-      interactiveTerminal.session = [
-        { 
-          type: 'command', 
-          content: [
-            { text: 'git', color: '#569cd6', fontWeight: 'bold' },
-            { text: ' log ', color: '#ffffff' },
-            { text: '--oneline', color: '#ce9178' }
-          ],
-          delay: 500 
-        },
-        {
-          type: 'output',
-          content: [
-            { text: 'a1b2c3d', color: '#dcdcaa', fontWeight: 'bold' },
-            { text: ' feat: add rich text support (', color: '#ffffff' },
-            { text: 'HEAD -> ', color: '#569cd6' },
-            { text: 'main', color: '#4ec9b0', fontWeight: 'bold' },
-            { text: ')', color: '#ffffff' }
-          ],
-          delay: 600
-        },
-        {
-          type: 'output',
-          content: [
-            { text: 'e4f5g6h', color: '#dcdcaa', fontWeight: 'bold' },
-            { text: ' fix: typing animation issues', color: '#ffffff' }
-          ],
-          delay: 400
-        },
-        {
-          type: 'output',
-          content: [
-            { text: 'i7j8k9l', color: '#dcdcaa', fontWeight: 'bold' },
-            { text: ' docs: update examples', color: '#ffffff' }
-          ],
-          delay: 400
-        }
-      ];
-      interactiveTerminal.autoplay = true;
-    };
-  </script>
-</body>
+      window.showTableExample = function () {
+        interactiveTerminal.session = [
+          {
+            type: "command",
+            content: "eslint src/ --format table",
+            delay: 500,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "┌─────────────────────────────────────┬──────────┬──────────┬────────────────┐",
+                color: "#666666",
+              },
+            ],
+            delay: 400,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "File",
+                isTableRow: true,
+                fontWeight: "bold",
+                tableColumn: "position",
+              },
+              { text: "Line:Col", fontWeight: "bold", tableColumn: "type" },
+              { text: "Type", fontWeight: "bold", tableColumn: "rule" },
+              { text: "Message", fontWeight: "bold", tableColumn: "message" },
+            ],
+            delay: 200,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "├─────────────────────────────────────┼──────────┼──────────┼────────────────┤",
+                color: "#666666",
+              },
+            ],
+            delay: 200,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "src/components/Header.jsx",
+                isTableRow: true,
+                tableColumn: "position",
+                columnGap: "24px",
+                rowGap: "8px",
+              },
+              { text: "12:5", color: "#dcdcaa", tableColumn: "type" },
+              { text: "error", color: "#cd3131", tableColumn: "rule" },
+              { text: "Missing semicolon (semi)", tableColumn: "message" },
+            ],
+            delay: 300,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "src/components/Footer.jsx",
+                isTableRow: true,
+                tableColumn: "position",
+              },
+              { text: "25:18", color: "#dcdcaa", tableColumn: "type" },
+              { text: "warning", color: "#949800", tableColumn: "rule" },
+              {
+                text: "Unused variable 'theme' (no-unused-vars)",
+                tableColumn: "message",
+              },
+            ],
+            delay: 300,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "src/utils/helpers.js",
+                isTableRow: true,
+                tableColumn: "position",
+              },
+              { text: "8:1", color: "#dcdcaa", tableColumn: "type" },
+              { text: "error", color: "#cd3131", tableColumn: "rule" },
+              {
+                text: "Expected indentation of 2 spaces (indent)",
+                tableColumn: "message",
+              },
+            ],
+            delay: 300,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "└─────────────────────────────────────┴──────────┴──────────┴────────────────┘",
+                color: "#666666",
+              },
+            ],
+            delay: 200,
+          },
+          {
+            type: "error",
+            content: [
+              {
+                text: "✖ 3 problems (2 errors, 1 warning)",
+                color: "#cd3131",
+                fontWeight: "bold",
+              },
+            ],
+            delay: 600,
+          },
+        ];
+        interactiveTerminal.autoplay = true;
+      };
+    </script>
+  </body>
 </html>

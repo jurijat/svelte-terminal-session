@@ -13,6 +13,14 @@ export interface RichTextSegment {
   fontWeight?: 'normal' | 'bold';
   textDecoration?: 'none' | 'underline';
   fontStyle?: 'normal' | 'italic';
+  // Table/Grid layout properties
+  tableColumn?: 'position' | 'type' | 'rule' | 'message'; // Semantic column types
+  width?: string; // CSS width like "60px", "20%"
+  align?: 'left' | 'right' | 'center';
+  isTableRow?: boolean; // Indicates this segment starts a new table row
+  // Gap configuration for table layout
+  columnGap?: string; // CSS gap between columns like "16px", "1em"
+  rowGap?: string; // CSS gap between rows like "4px", "0.2em"
 }
 
 export type SessionContent = string | RichTextSegment[];

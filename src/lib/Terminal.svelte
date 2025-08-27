@@ -327,6 +327,33 @@
     return content.map(segment => segment.text).join('');
   }
   
+  function hasTableContent(content: SessionContent): boolean {
+    if (!isRichContent(content)) return false;
+    return content.some(segment => segment.isTableRow || segment.tableColumn);
+  }
+  
+  function groupIntoTableRows(content: RichTextSegment[]): RichTextSegment[][] {
+    const rows: RichTextSegment[][] = [];
+    let currentRow: RichTextSegment[] = [];
+    
+    for (const segment of content) {
+      if (segment.isTableRow && currentRow.length > 0) {
+        // Finish current row and start a new one
+        rows.push([...currentRow]);
+        currentRow = [segment];
+      } else {
+        currentRow.push(segment);
+      }
+    }
+    
+    // Don't forget the last row
+    if (currentRow.length > 0) {
+      rows.push([...currentRow]);
+    }
+    
+    return rows;
+  }
+  
   
   function skipTyping() {
     // Skip current typing animation and show full content
@@ -726,12 +753,31 @@
     onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') skipTyping(); }}
   >
     {#each displayedSteps as step, index}
-      <div class="terminal-line {getStepClass(step.type)}">
-        <pre>{#if step.type === 'command'}{step.prompt || '$'} {/if}{#if index === typingStepIndex}{typedContent}{:else if isRichContent(step.content)}{#each step.content as segment}<span 
-          class="rich-text-segment" 
-          style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}"
-        >{@html segment.text.replace(/\n/g, '<br>')}</span>{/each}{:else}{@html step.content.replace(/\n/g, '<br>')}{/if}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
-      </div>
+      {#if isRichContent(step.content) && hasTableContent(step.content)}
+        <!-- Table content (outside pre) -->
+        <div class="terminal-line {getStepClass(step.type)}">
+          <div class="terminal-table">
+            {#each groupIntoTableRows(step.content) as row}
+              {@const firstSegment = row[0]}
+              {@const columnGap = firstSegment?.columnGap || '16px'}
+              {@const rowGap = firstSegment?.rowGap || '4px'}
+              <div class="terminal-table-row" style="column-gap: {columnGap}; margin-bottom: {rowGap};">
+                {#each row as segment}
+                  <div class="terminal-table-cell {segment.tableColumn ? `col-${segment.tableColumn}` : ''}" 
+                    style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.width ? `width: ${segment.width};` : ''}{segment.align ? `text-align: ${segment.align};` : ''}">
+                    {segment.text.trim()}
+                  </div>
+                {/each}
+              </div>
+            {/each}
+          </div>
+        </div>
+      {:else}
+        <!-- Regular content (in pre) -->
+        <div class="terminal-line {getStepClass(step.type)}">
+<pre>{#if step.type === 'command'}{step.prompt || '$'} {/if}{#if index === typingStepIndex}{typedContent}{:else if isRichContent(step.content)}{#each step.content as segment}<span class="rich-text-segment" style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}">{@html segment.text.replace(/\n/g, '<br>')}</span>{/each}{:else}{@html step.content.replace(/\n/g, '<br>')}{/if}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
+        </div>
+      {/if}
     {/each}
     {#if isPlaying && typingStepIndex === -1}
       <div class="terminal-cursor">▊</div>
@@ -878,6 +924,8 @@
   .terminal-line pre {
     margin: 0;
     font-family: inherit;
+    display: block;
+    white-space: pre-wrap;
   }
 
   .step-command {
@@ -1097,5 +1145,53 @@
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
+  }
+
+  /* Table layout styling */
+  .terminal-table {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+  }
+
+  .terminal-table-row {
+    display: grid !important;
+    grid-template-columns: 60px 100px 180px 1fr !important;
+    min-height: 1.5em;
+    align-items: baseline;
+    font-family: inherit;
+  }
+
+  .terminal-table-cell {
+    overflow: visible;
+    padding-right: 8px;
+  }
+
+  /* Semantic column styling with fixed positioning */
+  .terminal-table-row .terminal-table-cell.col-position {
+    grid-column: 1;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .terminal-table-row .terminal-table-cell.col-type {
+    grid-column: 2;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .terminal-table-row .terminal-table-cell.col-rule {
+    grid-column: 3;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .terminal-table-row .terminal-table-cell.col-message {
+    grid-column: 4;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left;
   }
 </style>
