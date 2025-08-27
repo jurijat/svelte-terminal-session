@@ -124,6 +124,7 @@
   let typedContent = $state('');
   let hasAutoPlayed = $state(false);
   let isVisible = $state(false);
+  let previousAutoplay = $state(autoplay);
   
   // Non-reactive variables for internal tracking
   let playbackTimer: ReturnType<typeof setTimeout> | null = null;
@@ -216,9 +217,12 @@
     const charDelay = 1000 / charsPerSecond;
     
     function typeChar() {
-      if (!isPlaying) {
-        // Playback was stopped
+      // More defensive check - ensure we're still in a valid state
+      if (!isPlaying || !currentSession || typingStepIndex < 0) {
+        // Playback was stopped or invalid state
         typingTimer = null;
+        typingStepIndex = -1;
+        typedContent = '';
         return;
       }
       
@@ -236,7 +240,10 @@
         const variation = charDelay * 0.2;
         const randomDelay = charDelay + (Math.random() - 0.5) * variation;
         
-        typingTimer = setTimeout(typeChar, randomDelay);
+        // Use requestAnimationFrame to ensure smooth animation even when tab is not active
+        typingTimer = setTimeout(() => {
+          requestAnimationFrame(() => typeChar());
+        }, randomDelay);
       } else {
         // Typing complete
         typingStepIndex = -1;
@@ -253,8 +260,8 @@
       }
     }
     
-    // Start typing
-    typeChar();
+    // Start typing with requestAnimationFrame for smoother start
+    requestAnimationFrame(() => typeChar());
   }
 
   function resetPlayback() {
@@ -356,8 +363,9 @@
   
   // Effect 1: Set up IntersectionObserver to track visibility only
   $effect(() => {
-    if (terminalElement && !observer && typeof IntersectionObserver !== 'undefined') {
-      observer = new IntersectionObserver(
+    if (terminalElement && typeof IntersectionObserver !== 'undefined') {
+      // Always create a new observer when terminal element changes
+      const newObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             isVisible = entry.isIntersecting;
@@ -366,19 +374,31 @@
         { threshold: 0.1 } // Trigger when 10% visible
       );
       
-      observer.observe(terminalElement);
-    }
-    
-    // Cleanup
-    return () => {
-      if (observer) {
-        observer.disconnect();
+      newObserver.observe(terminalElement);
+      observer = newObserver;
+      
+      // Cleanup
+      return () => {
+        if (newObserver) {
+          newObserver.disconnect();
+        }
         observer = null;
-      }
-    };
+      };
+    }
   });
   
-  // Effect 2: Handle autoplay reactively when conditions are met
+  // Effect 2: Handle autoplay changes - reset hasAutoPlayed when autoplay changes from false to true
+  $effect(() => {
+    if (autoplay !== previousAutoplay) {
+      if (!previousAutoplay && autoplay) {
+        // Autoplay changed from false to true - allow autoplay to trigger again
+        hasAutoPlayed = false;
+      }
+      previousAutoplay = autoplay;
+    }
+  });
+  
+  // Effect 3: Handle autoplay reactively when conditions are met
   $effect(() => {
     if (
       autoplay && 
@@ -394,7 +414,7 @@
     }
   });
   
-  // Effect 3: Initialize component and handle session changes
+  // Effect 4: Initialize component and handle session changes
   $effect(() => {
     if (terminalElement) {
       // Initialize first tab if tabs are provided

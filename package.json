@@ -1,6 +1,6 @@
 {
   "name": "svelte-terminal-session",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A powerful, themeable terminal session recorder/player web component built with Svelte 5",
   "type": "module",
   "main": "./dist/terminal-session.umd.js",
