@@ -6,9 +6,20 @@ export type SessionStepType =
   | "info"
   | "success";
 
+export interface RichTextSegment {
+  text: string;
+  color?: string;
+  backgroundColor?: string;
+  fontWeight?: 'normal' | 'bold';
+  textDecoration?: 'none' | 'underline';
+  fontStyle?: 'normal' | 'italic';
+}
+
+export type SessionContent = string | RichTextSegment[];
+
 export interface SessionStep {
   type: SessionStepType;
-  content: string;
+  content: SessionContent;
   timestamp?: number;
   delay?: number;
   prompt?: string;

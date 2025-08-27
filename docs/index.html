@@ -253,12 +253,19 @@
     </div>
 
     <div class="demo-section">
+      <h2>Rich Text Colorization</h2>
+      <p>Terminal with colorized output similar to real terminal applications:</p>
+      <terminal-session id="rich-content-terminal" autoplay="true"></terminal-session>
+    </div>
+
+    <div class="demo-section">
       <h2>Interactive Controls</h2>
       <div class="controls">
         <button onclick="addCustomSession()">Load Custom Session</button>
         <button onclick="toggleTheme()">Toggle Theme</button>
         <button onclick="changeSpeed()">Change Speed</button>
         <button onclick="showErrorExample()">Show Error Example</button>
+        <button onclick="showRichContentExample()">Show Rich Content</button>
       </div>
       <terminal-session id="interactive-terminal" autoplay="false"></terminal-session>
     </div>
@@ -589,6 +596,88 @@
       observer.observe(document.getElementById('minimal-no-toolbar'));
     }
 
+    // Rich content terminal
+    const richContentTerminal = document.getElementById('rich-content-terminal');
+    richContentTerminal.session = [
+      { 
+        type: 'command', 
+        content: [
+          { text: '➜ ', color: '#cd3131', fontWeight: 'bold' },
+          { text: 'api-validator', color: '#0598bc', fontWeight: 'bold' },
+          { text: ' git:(', color: '#0451a5', fontWeight: 'bold' },
+          { text: 'feat/landing-redesign', color: '#cd3131', fontWeight: 'bold' },
+          { text: ') ', color: '#0451a5', fontWeight: 'bold' },
+          { text: '✗', color: '#949800', fontWeight: 'bold' },
+          { text: ' npm run start -- ./petstore.v3.yaml' }
+        ],
+        delay: 500
+      },
+      { 
+        type: 'output', 
+        content: '> @sap/api-metadata-validator@3.22.0 start\n> ts-node ./src/cli.ts -r sap:core:v1 "./examples/valid/*.json" ./petstore.v3.yaml',
+        delay: 800 
+      },
+      {
+        type: 'output',
+        content: [
+          { text: 'SAP API Metadata Validator v3.22.0', backgroundColor: '#bfbfbf', color: '#000000', fontWeight: 'bold' }
+        ],
+        delay: 600
+      },
+      {
+        type: 'output',
+        content: [
+          { text: '/Users/dev/petstore.v3.yaml', textDecoration: 'underline' },
+          { text: ' [compliance-level: ' },
+          { text: 'sap:core:v1', fontWeight: 'bold', textDecoration: 'underline' },
+          { text: ', overrides-detected: ' },
+          { text: 'No', color: '#cd3131', fontWeight: 'bold' },
+          { text: ']' }
+        ],
+        delay: 400
+      },
+      {
+        type: 'output',
+        content: [
+          { text: '1:1 ' },
+          { text: 'error', color: '#cd3131' },
+          { text: ' ' },
+          { text: 'sap-oas-short-text', textDecoration: 'underline' },
+          { text: ' A short description in the `x-sap-shortText` field is missing.' }
+        ],
+        delay: 500
+      },
+      {
+        type: 'output',
+        content: [
+          { text: '4:10 ' },
+          { text: 'warning', color: '#949800' },
+          { text: ' ' },
+          { text: 'sap-oas-title-chars', textDecoration: 'underline' },
+          { text: ' The API name should use the allowed charset.' }
+        ],
+        delay: 500
+      },
+      {
+        type: 'output',
+        content: [
+          { text: '10:9 ' },
+          { text: 'information', color: '#0451a5' },
+          { text: ' ' },
+          { text: 'sap-oas3-sandbox', textDecoration: 'underline' },
+          { text: ' The sandbox definition is missing.' }
+        ],
+        delay: 500
+      },
+      {
+        type: 'error',
+        content: [
+          { text: '✖ 4 problems (2 errors, 1 warning, 1 info)', color: '#cd3131', fontWeight: 'bold' }
+        ],
+        delay: 800
+      }
+    ];
+
     // Interactive terminal
     const interactiveTerminal = document.getElementById('interactive-terminal');
     interactiveTerminal.session = [
@@ -632,6 +721,48 @@
         { type: 'error', content: '  ● Terminal › should render without errors\n\n    TypeError: Cannot read property \'theme\' of undefined', delay: 800 },
         { type: 'output', content: '\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total', delay: 600 },
         { type: 'error', content: 'npm ERR! Test failed. See above for more details.', delay: 500 }
+      ];
+      interactiveTerminal.autoplay = true;
+    };
+
+    window.showRichContentExample = function() {
+      interactiveTerminal.session = [
+        { 
+          type: 'command', 
+          content: [
+            { text: 'git', color: '#569cd6', fontWeight: 'bold' },
+            { text: ' log ', color: '#ffffff' },
+            { text: '--oneline', color: '#ce9178' }
+          ],
+          delay: 500 
+        },
+        {
+          type: 'output',
+          content: [
+            { text: 'a1b2c3d', color: '#dcdcaa', fontWeight: 'bold' },
+            { text: ' feat: add rich text support (', color: '#ffffff' },
+            { text: 'HEAD -> ', color: '#569cd6' },
+            { text: 'main', color: '#4ec9b0', fontWeight: 'bold' },
+            { text: ')', color: '#ffffff' }
+          ],
+          delay: 600
+        },
+        {
+          type: 'output',
+          content: [
+            { text: 'e4f5g6h', color: '#dcdcaa', fontWeight: 'bold' },
+            { text: ' fix: typing animation issues', color: '#ffffff' }
+          ],
+          delay: 400
+        },
+        {
+          type: 'output',
+          content: [
+            { text: 'i7j8k9l', color: '#dcdcaa', fontWeight: 'bold' },
+            { text: ' docs: update examples', color: '#ffffff' }
+          ],
+          delay: 400
+        }
       ];
       interactiveTerminal.autoplay = true;
     };

@@ -22,7 +22,7 @@
 
 <script lang="ts">
   import { tick } from 'svelte';
-  import type { SessionStep, Theme, ColorScheme, TabConfig, TabState } from './types';
+  import type { SessionStep, Theme, ColorScheme, TabConfig, TabState, RichTextSegment, SessionContent } from './types';
   import { darkTheme, lightTheme, applyTheme, mergeColors } from './themes';
 
   interface Props {
@@ -209,7 +209,8 @@
     // Add the step with empty content initially
     displayedSteps = [...displayedSteps, { ...step, content: '' }];
     
-    const fullContent = step.content;
+    // Convert rich content to string for typing animation
+    const fullContent = getContentAsString(step.content);
     let charIndex = 0;
     
     // Calculate typing speed (use step override or global setting)
@@ -315,18 +316,17 @@
     return `step-${type}`;
   }
 
-  function formatContent(step: SessionStep, index: number): string {
-    const prompt = step.prompt || '$';
-    
-    if (step.type === 'command') {
-      // If this step is currently being typed, show partial content
-      if (index === typingStepIndex) {
-        return `${prompt} ${typedContent}`;
-      }
-      return `${prompt} ${step.content}`;
-    }
-    return step.content;
+  function isRichContent(content: SessionContent): content is RichTextSegment[] {
+    return Array.isArray(content);
   }
+  
+  function getContentAsString(content: SessionContent): string {
+    if (typeof content === 'string') {
+      return content;
+    }
+    return content.map(segment => segment.text).join('');
+  }
+  
   
   function skipTyping() {
     // Skip current typing animation and show full content
@@ -727,7 +727,10 @@
   >
     {#each displayedSteps as step, index}
       <div class="terminal-line {getStepClass(step.type)}">
-        <pre>{formatContent(step, index)}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
+        <pre>{#if step.type === 'command'}{step.prompt || '$'} {/if}{#if index === typingStepIndex}{typedContent}{:else if isRichContent(step.content)}{#each step.content as segment}<span 
+          class="rich-text-segment" 
+          style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}"
+        >{@html segment.text.replace(/\n/g, '<br>')}</span>{/each}{:else}{@html step.content.replace(/\n/g, '<br>')}{/if}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
       </div>
     {/each}
     {#if isPlaying && typingStepIndex === -1}
@@ -1082,5 +1085,17 @@
   .terminal-tabs::-webkit-scrollbar-thumb {
     background: var(--terminal-border);
     border-radius: 2px;
+  }
+
+  /* Rich text segment styling */
+  .rich-text-segment {
+    display: inline;
+  }
+
+  /* Ensure rich text inherits terminal font properties */
+  .terminal-line .rich-text-segment {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
   }
 </style>
