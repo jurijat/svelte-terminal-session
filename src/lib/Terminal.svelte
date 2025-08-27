@@ -1,16 +1,16 @@
 <svelte:options customElement={{
   tag: "terminal-session",
   props: {
-    showPlayButton: { attribute: 'show-play-button', type: 'Boolean' },
-    showResetButton: { attribute: 'show-reset-button', type: 'Boolean' },
-    showThemeToggle: { attribute: 'show-theme-toggle', type: 'Boolean' },
-    showWindowButtons: { attribute: 'show-window-buttons', type: 'Boolean' },
+    showPlayButton: { attribute: 'show-play-button' },
+    showResetButton: { attribute: 'show-reset-button' },
+    showThemeToggle: { attribute: 'show-theme-toggle' },
+    showWindowButtons: { attribute: 'show-window-buttons' },
     showTabs: { attribute: 'show-tabs', type: 'Boolean' },
     allowTabClose: { attribute: 'allow-tab-close', type: 'Boolean' },
     allowTabAdd: { attribute: 'allow-tab-add', type: 'Boolean' },
     autoplay: { attribute: 'autoplay', type: 'Boolean' },
     enableTyping: { attribute: 'enable-typing', type: 'Boolean' },
-    showHeader: { attribute: 'show-header', type: 'Boolean' },
+    showHeader: { attribute: 'show-header' },
     playbackSpeed: { attribute: 'playback-speed', type: 'Number' },
     typingSpeed: { attribute: 'typing-speed', type: 'Number' },
     activeTab: { attribute: 'active-tab', type: 'Number' },
@@ -98,23 +98,65 @@
   // Lifecycle: Handle component mount
   // No longer need manual attribute parsing - Svelte handles this for custom elements
 
-  // Computed button visibility - use props directly with defaults
-  let showPlayButtonComputed = $derived(showPlayButton ?? true);
+  // Helper function to parse boolean attributes correctly
+  function parseBooleanProp(prop: any, defaultValue: boolean = true, propName: string = ''): boolean {
+    console.log(`[parseBooleanProp] ${propName}:`, {
+      raw: prop,
+      type: typeof prop,
+      isUndefined: prop === undefined,
+      isNull: prop === null,
+      defaultValue
+    });
+    
+    if (prop === undefined || prop === null) return defaultValue;
+    if (typeof prop === 'boolean') return prop;
+    if (typeof prop === 'string') {
+      // Handle string values from HTML attributes
+      if (prop.toLowerCase() === 'false') return false;
+      if (prop.toLowerCase() === 'true') return true;
+      // Empty string or any other value is considered true for boolean attributes
+      return true;
+    }
+    return defaultValue;
+  }
+
+  // Debug: Log raw prop values
+  console.log('[Terminal Props] Raw values:', {
+    showPlayButton,
+    showResetButton,
+    showThemeToggle,
+    showWindowButtons,
+    showHeader
+  });
+
+  // Computed button visibility - parse boolean props correctly
+  let showPlayButtonComputed = $derived(parseBooleanProp(showPlayButton, true, 'showPlayButton'));
   
-  let showResetButtonComputed = $derived(showResetButton ?? true);
+  let showResetButtonComputed = $derived(parseBooleanProp(showResetButton, true, 'showResetButton'));
   
-  let showThemeToggleComputed = $derived(showThemeToggle ?? true);
+  let showThemeToggleComputed = $derived(parseBooleanProp(showThemeToggle, true, 'showThemeToggle'));
   
-  let showWindowButtonsComputed = $derived(showWindowButtons ?? true);
+  let showWindowButtonsComputed = $derived(parseBooleanProp(showWindowButtons, true, 'showWindowButtons'));
   
   // Check if any control buttons should be shown
   let hasControlButtons = $derived(
     showPlayButtonComputed || showResetButtonComputed || showThemeToggleComputed
   );
+
+  // Debug: Log computed values
+  $effect(() => {
+    console.log('[Terminal Computed] Button visibility:', {
+      showPlayButtonComputed,
+      showResetButtonComputed,
+      showThemeToggleComputed,
+      showWindowButtonsComputed,
+      hasControlButtons
+    });
+  });
   
   
   // Use header visibility prop with default
-  let showHeaderComputed = $derived(showHeader ?? true);
+  let showHeaderComputed = $derived(parseBooleanProp(showHeader, true));
   
   // Playback state - These are the ONLY stateful variables
   let currentStepIndex = $state(0);

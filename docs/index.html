@@ -743,30 +743,8 @@
       richContentTerminal.session = [
         {
           type: "command",
-          content: [
-            { text: "➜ ", color: "#cd3131", fontWeight: "bold" },
-            {
-              text: "api-metadata-validator",
-              color: "#0598bc",
-              fontWeight: "bold",
-            },
-            { text: " git:(", color: "#0451a5", fontWeight: "bold" },
-            {
-              text: "feat/landing-redesign",
-              color: "#cd3131",
-              fontWeight: "bold",
-            },
-            { text: ") ", color: "#0451a5", fontWeight: "bold" },
-            { text: "✗", color: "#949800", fontWeight: "bold" },
-            { text: " api-metadata-validator ./petstore.v3.yaml" },
-          ],
+          content: [{ text: " api-metadata-validator ./petstore.v3.yaml" }],
           delay: 500,
-        },
-        {
-          type: "output",
-          content:
-            '> @sap/api-metadata-validator@3.22.0 start\n> ts-node ./src/cli.ts -r sap:core:v1 "./examples/valid/*.json" ./petstore.v3.yaml',
-          delay: 800,
         },
         {
           type: "output",
@@ -803,11 +781,12 @@
           type: "output",
           content: [
             // Full API validator table output
+            // Row 1: First error
             {
               text: "1:1",
               isTableRow: true,
               tableColumn: "position",
-              columnGap: "50px",
+              columnGap: "20px",
               rowGap: "6px",
             },
             { text: "error", color: "#cd3131", tableColumn: "type" },
@@ -821,12 +800,13 @@
               tableColumn: "message",
             },
 
+            // Row 2: Warning with context line following
             {
               text: "4:10",
               isTableRow: true,
               tableColumn: "position",
-
-              columnGap: "50px",
+              columnGap: "16px",
+              rowGap: "4px",
             },
             { text: "warning", color: "#949800", tableColumn: "type" },
             {
@@ -839,16 +819,25 @@
               tableColumn: "message",
             },
 
-            { text: "", isTableRow: true, tableColumn: "position" },
+            // Context line for warning above
+            {
+              text: "",
+              isTableRow: true,
+              tableColumn: "position",
+              columnGap: "16px",
+              rowGap: "4px",
+            },
             { text: "", tableColumn: "type" },
             { text: "", tableColumn: "rule" },
-            { text: "info.title", tableColumn: "message" },
+            { text: "                        info.title", tableColumn: "message", color: "#666" },
 
+            // Row 3: Information with context line following
             {
               text: "10:9",
               isTableRow: true,
               tableColumn: "position",
-              columnGap: "50px",
+              columnGap: "16px",
+              rowGap: "4px",
             },
             { text: "information", color: "#0451a5", tableColumn: "type" },
             {
@@ -861,16 +850,25 @@
               tableColumn: "message",
             },
 
-            { text: "", isTableRow: true, tableColumn: "position" },
+            // Context line for information above
+            {
+              text: "",
+              isTableRow: true,
+              tableColumn: "position",
+              columnGap: "16px",
+              rowGap: "4px",
+            },
             { text: "", tableColumn: "type" },
             { text: "", tableColumn: "rule" },
-            { text: "servers", tableColumn: "message" },
+            { text: "                        servers", tableColumn: "message", color: "#666" },
 
+            // Row 4: Error with context line following
             {
               text: "14:9",
               isTableRow: true,
               tableColumn: "position",
-              columnGap: "50px",
+              columnGap: "16px",
+              rowGap: "4px",
             },
             { text: "error", color: "#cd3131", tableColumn: "type" },
             {
@@ -883,10 +881,17 @@
               tableColumn: "message",
             },
 
-            { text: "", isTableRow: true, tableColumn: "position" },
+            // Context line for error above
+            {
+              text: "",
+              isTableRow: true,
+              tableColumn: "position",
+              columnGap: "16px",
+              rowGap: "4px",
+            },
             { text: "", tableColumn: "type" },
             { text: "", tableColumn: "rule" },
-            { text: "paths./pets.get", tableColumn: "message" },
+            { text: "                        paths./pets.get", tableColumn: "message", color: "#666" },
           ],
           delay: 500,
         },
