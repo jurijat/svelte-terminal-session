@@ -13,6 +13,9 @@ export interface RichTextSegment {
   fontWeight?: 'normal' | 'bold';
   textDecoration?: 'none' | 'underline';
   fontStyle?: 'normal' | 'italic';
+  // URL/Link properties
+  url?: string; // URL to link to
+  target?: '_blank' | '_self'; // Link target (default: '_blank' for external links)
   // Spacing and display properties
   display?: 'inline' | 'block'; // Display type for the segment
   marginTop?: string; // CSS margin like "10px", "1em"

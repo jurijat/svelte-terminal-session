@@ -396,6 +396,62 @@
     return rows;
   }
   
+  function isValidUrl(url: string): boolean {
+    // Validate URL to prevent XSS attacks
+    if (!url) return false;
+    
+    // Block dangerous protocols
+    const dangerousProtocols = ['javascript:', 'data:', 'vbscript:'];
+    const lowerUrl = url.toLowerCase().trim();
+    
+    if (dangerousProtocols.some(protocol => lowerUrl.startsWith(protocol))) {
+      return false;
+    }
+    
+    // Allow common safe protocols or relative URLs
+    const safeProtocols = ['http://', 'https://', 'mailto:', 'tel:', '//', '/'];
+    const isSafeProtocol = safeProtocols.some(protocol => lowerUrl.startsWith(protocol));
+    
+    // If no protocol, treat as relative URL (safe)
+    const hasProtocol = lowerUrl.includes(':');
+    
+    return isSafeProtocol || !hasProtocol;
+  }
+  
+  function renderSegmentContent(segment: RichTextSegment): string {
+    const escapedText = segment.text.replace(/\n/g, '<br>');
+    
+    if (segment.url && isValidUrl(segment.url)) {
+      const target = segment.target || '_blank';
+      const rel = target === '_blank' ? 'noopener noreferrer' : '';
+      // Don't include textDecoration in style for links - let CSS handle it
+      let style = getSegmentStyle(segment, true);
+      // Add inline link styles as fallback
+      const linkStyles = 'color: white; text-decoration: none; border-bottom: 1px dashed white; cursor: pointer; display: inline-block; padding-bottom: 1px;';
+      style = style ? `${style}; ${linkStyles}` : linkStyles;
+      
+      return `<a href="${segment.url}" target="${target}" rel="${rel}" style="${style}" class="terminal-link" onmouseover="this.style.borderBottomStyle='solid'" onmouseout="this.style.borderBottomStyle='dashed'">${escapedText}</a>`;
+    }
+    
+    return escapedText;
+  }
+  
+  function getSegmentStyle(segment: RichTextSegment, excludeTextDecoration = false): string {
+    const styles: string[] = [];
+    
+    if (segment.color) styles.push(`color: ${segment.color}`);
+    if (segment.backgroundColor) styles.push(`background-color: ${segment.backgroundColor}`);
+    if (segment.fontWeight) styles.push(`font-weight: ${segment.fontWeight}`);
+    // Only include textDecoration if not excluded (for links, we want CSS to handle it)
+    if (!excludeTextDecoration && segment.textDecoration) styles.push(`text-decoration: ${segment.textDecoration}`);
+    if (segment.fontStyle) styles.push(`font-style: ${segment.fontStyle}`);
+    if (segment.marginTop) styles.push(`margin-top: ${segment.marginTop}`);
+    if (segment.marginBottom) styles.push(`margin-bottom: ${segment.marginBottom}`);
+    if (segment.marginLeft) styles.push(`margin-left: ${segment.marginLeft}`);
+    if (segment.marginRight) styles.push(`margin-right: ${segment.marginRight}`);
+    
+    return styles.join('; ');
+  }
   
   function skipTyping() {
     // Skip current typing animation and show full content
@@ -806,8 +862,8 @@
               <div class="terminal-table-row" style="gap: {columnGap}; margin-bottom: {rowGap};">
                 {#each row as segment}
                   <div class="terminal-table-cell {segment.tableColumn ? `col-${segment.tableColumn}` : ''}" 
-                    style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.width ? `width: ${segment.width};` : ''}{segment.align ? `text-align: ${segment.align};` : ''}">
-                    {segment.text.trim()}
+                    style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.width ? `width: ${segment.width};` : ''}{segment.align ? `text-align: ${segment.align};` : ''}">
+                    {@html renderSegmentContent(segment)}
                   </div>
                 {/each}
               </div>
@@ -817,7 +873,7 @@
       {:else}
         <!-- Regular content (in pre) -->
         <div class="terminal-line {getStepClass(step.type)}" style="{step.marginTop ? `margin-top: ${step.marginTop};` : ''}{step.marginBottom ? `margin-bottom: ${step.marginBottom};` : ''}">
-<pre>{#if step.type === 'command'}{step.prompt || '$'} {/if}{#if index === typingStepIndex}{typedContent}{:else if isRichContent(step.content)}{#each step.content as segment}{#if segment.display === 'block'}<div class="rich-text-segment" style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.marginTop ? `margin-top: ${segment.marginTop};` : ''}{segment.marginBottom ? `margin-bottom: ${segment.marginBottom};` : ''}{segment.marginLeft ? `margin-left: ${segment.marginLeft};` : ''}{segment.marginRight ? `margin-right: ${segment.marginRight};` : ''}">{@html segment.text.replace(/\n/g, '<br>')}</div>{:else}<span class="rich-text-segment" style="{segment.color ? `color: ${segment.color};` : ''}{segment.backgroundColor ? `background-color: ${segment.backgroundColor};` : ''}{segment.fontWeight ? `font-weight: ${segment.fontWeight};` : ''}{segment.textDecoration ? `text-decoration: ${segment.textDecoration};` : ''}{segment.fontStyle ? `font-style: ${segment.fontStyle};` : ''}{segment.marginLeft ? `margin-left: ${segment.marginLeft};` : ''}{segment.marginRight ? `margin-right: ${segment.marginRight};` : ''}">{@html segment.text.replace(/\n/g, '<br>')}</span>{/if}{/each}{:else}{@html step.content.replace(/\n/g, '<br>')}{/if}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
+<pre>{#if step.type === 'command'}{step.prompt || '$'} {/if}{#if index === typingStepIndex}{typedContent}{:else if isRichContent(step.content)}{#each step.content as segment}{#if segment.display === 'block'}<div class="rich-text-segment" style="{getSegmentStyle(segment)}">{@html renderSegmentContent(segment)}</div>{:else}<span class="rich-text-segment" style="{getSegmentStyle(segment)}">{@html renderSegmentContent(segment)}</span>{/if}{/each}{:else}{@html step.content.replace(/\n/g, '<br>')}{/if}{#if index === typingStepIndex}<span class="typing-cursor">▊</span>{/if}</pre>
         </div>
       {/if}
     {/each}
@@ -1011,6 +1067,49 @@
   @keyframes blink {
     0%, 50% { opacity: 1; }
     51%, 100% { opacity: 0; }
+  }
+
+  /* Link styles */
+  .terminal-link {
+    color: inherit;
+    text-decoration: none !important; /* Remove default underline */
+    border-bottom: 1px dashed currentColor !important;
+    transition: border-bottom-style 0.2s ease;
+    cursor: pointer;
+    display: inline-block; /* Ensure the element is interactive */
+  }
+
+  .terminal-link:hover {
+    border-bottom-style: solid !important;
+  }
+
+  .terminal-link:active {
+    opacity: 0.8;
+  }
+
+  /* Override link colors for different step types */
+  .step-output .terminal-link {
+    color: var(--terminal-output);
+  }
+
+  .step-error .terminal-link {
+    color: var(--terminal-error);
+  }
+
+  .step-warning .terminal-link {
+    color: var(--terminal-warning);
+  }
+
+  .step-info .terminal-link {
+    color: var(--terminal-info);
+  }
+
+  .step-success .terminal-link {
+    color: var(--terminal-success);
+  }
+
+  .step-command .terminal-link {
+    color: var(--terminal-command);
   }
 
   .terminal-content::-webkit-scrollbar {
