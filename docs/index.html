@@ -155,19 +155,29 @@
       <div class="demo-section">
         <h2>Basic Example</h2>
         <p>A simple terminal showing a git workflow session:</p>
-        <terminal-session id="basic-terminal"></terminal-session>
+        <terminal-session
+          id="basic-terminal"
+          show-theme-toggle="true"
+        ></terminal-session>
       </div>
 
       <div class="demo-section">
         <h2>Light Theme Example</h2>
         <p>Same session with light theme:</p>
-        <terminal-session id="light-terminal" theme="light"></terminal-session>
+        <terminal-session
+          id="light-terminal"
+          theme="light"
+          show-theme-toggle="true"
+        ></terminal-session>
       </div>
 
       <div class="demo-section">
         <h2>Custom Colors Example</h2>
         <p>Terminal with custom color scheme:</p>
-        <terminal-session id="custom-terminal"></terminal-session>
+        <terminal-session
+          id="custom-terminal"
+          show-theme-toggle="true"
+        ></terminal-session>
       </div>
 
       <div class="demo-section">
@@ -215,21 +225,89 @@
       </div>
 
       <div class="demo-section">
-        <h2>Tabbed Terminal with Background Processing</h2>
+        <h2>🧪 Test Tab Closing & Theme Toggle Features</h2>
         <p>
-          Tabs continue processing in the background when you switch between
-          them:
+          <strong
+            >Test the new tab closing and theme toggle functionality:</strong
+          >
         </p>
+
+        <div
+          style="
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+          "
+        >
+          <h4 style="margin-top: 0; color: #28a745">
+            🔄 Tab Closing Test Instructions:
+          </h4>
+          <ol style="margin-bottom: 0">
+            <li>
+              <strong>Switch between tabs</strong> to see different content
+              (Frontend, API, Tests, etc.)
+            </li>
+            <li>
+              <strong>Close the active tab</strong> by clicking the × button -
+              content should immediately switch to the next tab
+            </li>
+            <li>
+              <strong>Try closing different tabs</strong> - each has unique
+              content so you can verify the switch works
+            </li>
+            <li>
+              <strong>Close multiple tabs</strong> to test the behavior with
+              fewer tabs remaining
+            </li>
+          </ol>
+        </div>
+
+        <div
+          style="
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+          "
+        >
+          <h4 style="margin-top: 0; color: #007bff">
+            🎨 Theme Toggle Test Instructions:
+          </h4>
+          <ol style="margin-bottom: 0">
+            <li>
+              <strong>Look for the theme toggle button</strong> (☀/🌙) in the
+              terminal header
+            </li>
+            <li>
+              <strong>Click the theme button</strong> - theme should change
+              immediately
+            </li>
+            <li>
+              <strong>Toggle multiple times</strong> to verify smooth switching
+              between light/dark themes
+            </li>
+          </ol>
+        </div>
+
         <terminal-session
           id="tabbed-terminal"
           show-tabs="true"
           allow-tab-close="true"
           tab-bar-position="top"
           playback-speed="1.5"
+          show-theme-toggle="true"
         ></terminal-session>
+
         <p style="color: #666; font-size: 14px; margin-top: 10px">
-          💡 Try switching between tabs - they continue running in the
-          background!
+          ✅ <strong>Expected Behavior:</strong><br />
+          • Tab closing: Content switches immediately to next tab, no stale
+          content<br />
+          • Theme toggle: Instant theme change with button icon updating<br />
+          • Background processing: Tabs continue running when you switch between
+          them
         </p>
       </div>
 
@@ -284,10 +362,17 @@
           <button onclick="showErrorExample()">Show Error Example</button>
           <button onclick="showRichContentExample()">Show Rich Content</button>
           <button onclick="showTableExample()">Show Table Layout</button>
+          <button onclick="testTabClosing()" style="background: #28a745">
+            🧪 Test Tab Closing
+          </button>
+          <button onclick="testThemeToggle()" style="background: #007bff">
+            🎨 Test Theme Toggle
+          </button>
         </div>
         <terminal-session
           id="interactive-terminal"
           autoplay="false"
+          show-theme-toggle="true"
         ></terminal-session>
       </div>
 
@@ -469,102 +554,195 @@
       document.getElementById("toolbar-play-only").session = basicSession;
       document.getElementById("toolbar-no-header").session = basicSession;
 
-      // Tabbed terminal setup
+      // Tabbed terminal setup - Enhanced for testing tab closing
       const tabbedTerminal = document.getElementById("tabbed-terminal");
       tabbedTerminal.tabs = [
         {
-          id: "git-tab",
-          title: "Git Workflow",
-          icon: "📦",
-          session: basicSession,
+          id: "frontend-tab",
+          title: "Frontend Server",
+          icon: "🚀",
+          session: [
+            { type: "command", content: "npm run dev", delay: 500 },
+            { type: "output", content: "> vite dev --port 3000", delay: 600 },
+            {
+              type: "info",
+              content: "🔥 Vite v5.0.0 dev server running at:",
+              delay: 800,
+            },
+            {
+              type: "success",
+              content: "  ➜  Local:   http://localhost:3000/",
+              delay: 600,
+            },
+            {
+              type: "success",
+              content: "  ➜  Network: http://192.168.1.100:3000/",
+              delay: 400,
+            },
+            { type: "output", content: "  ready in 423ms", delay: 300 },
+            {
+              type: "info",
+              content: "[HMR] Hot Module Replacement enabled",
+              delay: 700,
+            },
+          ],
           closable: true,
           status: "success",
         },
         {
-          id: "build-tab",
-          title: "Build Process",
-          icon: "🔨",
+          id: "api-tab",
+          title: "API Server",
+          icon: "⚡",
           session: [
-            { type: "command", content: "npm run build", delay: 500 },
-            { type: "output", content: "> vite build", delay: 600 },
-            {
-              type: "info",
-              content: "vite v5.0.0 building for production...",
-              delay: 800,
-            },
-            { type: "output", content: "transforming (142)...", delay: 1000 },
+            { type: "command", content: "node server.js", delay: 500 },
             {
               type: "output",
-              content: "✓ 142 modules transformed.",
-              delay: 1200,
+              content: "🌟 Starting Express API server...",
+              delay: 600,
+            },
+            {
+              type: "info",
+              content: "📡 Connecting to MongoDB...",
+              delay: 800,
             },
             {
               type: "success",
-              content: "build completed in 2.14s",
+              content: "✅ Database connected successfully",
+              delay: 900,
+            },
+            {
+              type: "success",
+              content: "🚀 API server listening on port 8080",
+              delay: 600,
+            },
+            {
+              type: "output",
+              content: "📊 Health check endpoint: http://localhost:8080/health",
               delay: 500,
             },
           ],
           closable: true,
-          badge: 3,
+          badge: "API",
           status: "running",
         },
         {
-          id: "test-tab",
-          title: "Tests",
+          id: "testing-tab",
+          title: "Test Suite",
           icon: "🧪",
           session: [
-            { type: "command", content: "npm test", delay: 500 },
-            { type: "output", content: "Running test suite...", delay: 800 },
+            { type: "command", content: "npm run test:watch", delay: 500 },
+            {
+              type: "output",
+              content: "> jest --watch --coverage",
+              delay: 700,
+            },
+            {
+              type: "info",
+              content: "🔍 Running tests in watch mode...",
+              delay: 800,
+            },
             {
               type: "success",
-              content: "✓ Authentication tests passed (5/5)",
+              content: "✅ Components › Button.test.js (5 tests passed)",
               delay: 600,
             },
             {
               type: "success",
-              content: "✓ API tests passed (12/12)",
+              content: "✅ Utils › helpers.test.js (8 tests passed)",
+              delay: 500,
+            },
+            {
+              type: "error",
+              content: "❌ API › auth.test.js (2 tests failed)",
               delay: 600,
             },
-            { type: "error", content: "✗ UI tests failed (2/10)", delay: 600 },
             {
               type: "warning",
-              content: "Total: 17 passed, 2 failed",
+              content: "⚠️  Coverage: 87.5% (target: 90%)",
+              delay: 400,
+            },
+            {
+              type: "info",
+              content: "👀 Watching for file changes...",
               delay: 500,
             },
           ],
-          closable: false,
+          closable: true,
           status: "error",
         },
         {
-          id: "logs-tab",
-          title: "Server Logs",
-          icon: "📋",
+          id: "database-tab",
+          title: "Database",
+          icon: "🗄️",
           session: [
             {
-              type: "info",
-              content: "[2024-01-15 10:23:45] Server started on port 3000",
-              delay: 300,
+              type: "command",
+              content: "docker-compose up postgres",
+              delay: 500,
             },
             {
               type: "output",
-              content: "[2024-01-15 10:23:46] Database connected",
-              delay: 400,
+              content: "🐳 Starting PostgreSQL container...",
+              delay: 700,
             },
             {
-              type: "warning",
-              content:
-                "[2024-01-15 10:23:47] Deprecation warning: Using old API",
-              delay: 500,
+              type: "info",
+              content: "📦 Pulling postgres:15-alpine image...",
+              delay: 900,
             },
             {
               type: "success",
-              content: "[2024-01-15 10:23:48] All services initialized",
-              delay: 400,
+              content: "✅ Container postgres_db started",
+              delay: 800,
             },
             {
               type: "output",
-              content: "[2024-01-15 10:23:49] Listening for connections...",
+              content: "🔌 Database ready to accept connections",
+              delay: 600,
+            },
+            {
+              type: "success",
+              content: "🎯 Connection: postgresql://localhost:5432/myapp",
+              delay: 400,
+            },
+          ],
+          closable: true,
+          status: "success",
+        },
+        {
+          id: "monitoring-tab",
+          title: "Monitoring",
+          icon: "📊",
+          session: [
+            {
+              type: "command",
+              content: "npm run monitor",
               delay: 500,
+            },
+            {
+              type: "output",
+              content: "📈 Starting performance monitor...",
+              delay: 700,
+            },
+            {
+              type: "info",
+              content: "🔍 CPU Usage: 12.5%",
+              delay: 600,
+            },
+            {
+              type: "info",
+              content: "💾 Memory Usage: 256MB / 8GB",
+              delay: 500,
+            },
+            {
+              type: "warning",
+              content: "⚠️  API Response Time: 245ms (high)",
+              delay: 700,
+            },
+            {
+              type: "success",
+              content: "✅ All services healthy",
+              delay: 400,
             },
           ],
           closable: true,
@@ -949,8 +1127,16 @@
         { type: "output", content: "Hello, World!", delay: 500 },
       ];
 
+      // Helper function to reset terminal to single-session mode
+      function resetToSingleMode() {
+        interactiveTerminal.tabs = [];
+        interactiveTerminal.showTabs = false;
+        interactiveTerminal.allowTabClose = false;
+      }
+
       // Interactive functions
       window.addCustomSession = function () {
+        resetToSingleMode();
         interactiveTerminal.session = [
           { type: "command", content: "npm run build", delay: 500 },
           {
@@ -990,6 +1176,7 @@
       };
 
       window.showErrorExample = function () {
+        resetToSingleMode();
         interactiveTerminal.session = [
           { type: "command", content: "npm test", delay: 500 },
           {
@@ -1024,6 +1211,7 @@
       };
 
       window.showRichContentExample = function () {
+        resetToSingleMode();
         interactiveTerminal.session = [
           {
             type: "command",
@@ -1066,18 +1254,22 @@
       };
 
       window.showTableExample = function () {
+        resetToSingleMode();
         interactiveTerminal.session = [
           {
             type: "command",
-            content: "eslint src/ --format table",
+            content: "npm audit --audit-level=high",
             delay: 500,
           },
           {
             type: "output",
             content: [
               {
-                text: "┌─────────────────────────────────────┬──────────┬──────────┬────────────────┐",
-                color: "#666666",
+                text: "# npm audit report",
+                color: "#569cd6",
+                fontWeight: "bold",
+                display: "block",
+                marginBottom: "1em",
               },
             ],
             delay: 400,
@@ -1086,40 +1278,16 @@
             type: "output",
             content: [
               {
-                text: "File",
+                text: "Package",
                 isTableRow: true,
                 fontWeight: "bold",
                 tableColumn: "position",
+                columnGap: "20px",
+                rowGap: "6px",
               },
-              { text: "Line:Col", fontWeight: "bold", tableColumn: "type" },
-              { text: "Type", fontWeight: "bold", tableColumn: "rule" },
-              { text: "Message", fontWeight: "bold", tableColumn: "message" },
-            ],
-            delay: 200,
-          },
-          {
-            type: "output",
-            content: [
-              {
-                text: "├─────────────────────────────────────┼──────────┼──────────┼────────────────┤",
-                color: "#666666",
-              },
-            ],
-            delay: 200,
-          },
-          {
-            type: "output",
-            content: [
-              {
-                text: "src/components/Header.jsx",
-                isTableRow: true,
-                tableColumn: "position",
-                columnGap: "24px",
-                rowGap: "8px",
-              },
-              { text: "12:5", color: "#dcdcaa", tableColumn: "type" },
-              { text: "error", color: "#cd3131", tableColumn: "rule" },
-              { text: "Missing semicolon (semi)", tableColumn: "message" },
+              { text: "Severity", fontWeight: "bold", tableColumn: "type" },
+              { text: "Issue", fontWeight: "bold", tableColumn: "rule" },
+              { text: "Path", fontWeight: "bold", tableColumn: "message" },
             ],
             delay: 300,
           },
@@ -1127,59 +1295,231 @@
             type: "output",
             content: [
               {
-                text: "src/components/Footer.jsx",
+                text: "axios",
                 isTableRow: true,
                 tableColumn: "position",
+                columnGap: "20px",
+                rowGap: "6px",
               },
-              { text: "25:18", color: "#dcdcaa", tableColumn: "type" },
-              { text: "warning", color: "#949800", tableColumn: "rule" },
               {
-                text: "Unused variable 'theme' (no-unused-vars)",
-                tableColumn: "message",
-              },
-            ],
-            delay: 300,
-          },
-          {
-            type: "output",
-            content: [
-              {
-                text: "src/utils/helpers.js",
-                isTableRow: true,
-                tableColumn: "position",
-              },
-              { text: "8:1", color: "#dcdcaa", tableColumn: "type" },
-              { text: "error", color: "#cd3131", tableColumn: "rule" },
-              {
-                text: "Expected indentation of 2 spaces (indent)",
-                tableColumn: "message",
-              },
-            ],
-            delay: 300,
-          },
-          {
-            type: "output",
-            content: [
-              {
-                text: "└─────────────────────────────────────┴──────────┴──────────┴────────────────┘",
-                color: "#666666",
-              },
-            ],
-            delay: 200,
-          },
-          {
-            type: "error",
-            content: [
-              {
-                text: "✖ 3 problems (2 errors, 1 warning)",
+                text: "High",
                 color: "#cd3131",
                 fontWeight: "bold",
+                tableColumn: "type",
+              },
+              {
+                text: "Prototype Pollution",
+                color: "#ff6b6b",
+                tableColumn: "rule",
+              },
+              {
+                text: "node_modules/axios",
+                color: "#666",
+                tableColumn: "message",
+              },
+            ],
+            delay: 400,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "lodash",
+                isTableRow: true,
+                tableColumn: "position",
+                columnGap: "20px",
+              },
+              {
+                text: "Critical",
+                color: "#dc143c",
+                fontWeight: "bold",
+                tableColumn: "type",
+              },
+              {
+                text: "Command Injection",
+                color: "#ff4757",
+                tableColumn: "rule",
+              },
+              {
+                text: "node_modules/lodash",
+                color: "#666",
+                tableColumn: "message",
+              },
+            ],
+            delay: 400,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "express",
+                isTableRow: true,
+                tableColumn: "position",
+                columnGap: "20px",
+              },
+              {
+                text: "Moderate",
+                color: "#f39c12",
+                fontWeight: "bold",
+                tableColumn: "type",
+              },
+              { text: "Open Redirect", color: "#ffa502", tableColumn: "rule" },
+              {
+                text: "node_modules/express",
+                color: "#666",
+                tableColumn: "message",
+              },
+            ],
+            delay: 400,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "react-dom",
+                isTableRow: true,
+                tableColumn: "position",
+                columnGap: "20px",
+              },
+              {
+                text: "High",
+                color: "#cd3131",
+                fontWeight: "bold",
+                tableColumn: "type",
+              },
+              {
+                text: "XSS Vulnerability",
+                color: "#ff6b6b",
+                tableColumn: "rule",
+              },
+              {
+                text: "node_modules/react-dom",
+                color: "#666",
+                tableColumn: "message",
+              },
+            ],
+            delay: 400,
+          },
+          {
+            type: "output",
+            content: [
+              {
+                text: "minimist",
+                isTableRow: true,
+                tableColumn: "position",
+                columnGap: "20px",
+              },
+              { text: "Low", color: "#27ae60", tableColumn: "type" },
+              {
+                text: "Prototype Pollution",
+                color: "#2ed573",
+                tableColumn: "rule",
+              },
+              {
+                text: "node_modules/minimist",
+                color: "#666",
+                tableColumn: "message",
+              },
+            ],
+            delay: 400,
+          },
+          {
+            type: "warning",
+            content: [
+              {
+                text: "\nFound 5 vulnerabilities (1 low, 1 moderate, 2 high, 1 critical)",
+                color: "#f39c12",
+                fontWeight: "bold",
+                display: "block",
+                marginTop: "1em",
               },
             ],
             delay: 600,
           },
+          {
+            type: "info",
+            content: [
+              {
+                text: "Run `npm audit fix` to fix them, or `npm audit` for details.",
+                color: "#3498db",
+              },
+            ],
+            delay: 400,
+          },
         ];
         interactiveTerminal.autoplay = true;
+      };
+
+      // New test functions for tab closing and theme toggle
+      window.testTabClosing = function () {
+        // Set up tabs for testing tab closing
+        interactiveTerminal.tabs = [
+          {
+            id: "tab-test-1",
+            title: "Tab 1 - Build",
+            icon: "🔨",
+            session: [
+              { type: "command", content: "npm run build", delay: 500 },
+              { type: "output", content: "> Building project...", delay: 600 },
+              {
+                type: "success",
+                content: "✅ Build completed successfully!",
+                delay: 800,
+              },
+            ],
+            closable: true,
+          },
+          {
+            id: "tab-test-2",
+            title: "Tab 2 - Test",
+            icon: "🧪",
+            session: [
+              { type: "command", content: "npm test", delay: 500 },
+              {
+                type: "output",
+                content: "> Running test suite...",
+                delay: 700,
+              },
+              {
+                type: "success",
+                content: "✅ All 25 tests passed!",
+                delay: 900,
+              },
+            ],
+            closable: true,
+          },
+          {
+            id: "tab-test-3",
+            title: "Tab 3 - Deploy",
+            icon: "🚀",
+            session: [
+              { type: "command", content: "npm run deploy", delay: 500 },
+              {
+                type: "output",
+                content: "> Deploying to production...",
+                delay: 800,
+              },
+              {
+                type: "success",
+                content: "🎉 Deployed successfully!",
+                delay: 700,
+              },
+            ],
+            closable: true,
+          },
+        ];
+        interactiveTerminal.showTabs = true;
+        interactiveTerminal.allowTabClose = true;
+        alert(
+          "✅ Tabs loaded! Now try:\n1. Click between tabs to see different content\n2. Close the active tab by clicking ×\n3. Notice how content switches immediately!"
+        );
+      };
+
+      window.testThemeToggle = function () {
+        interactiveTerminal.showThemeToggle = true;
+        alert(
+          "✅ Theme toggle enabled! Look for the ☀/🌙 button in the terminal header and click it to test instant theme switching."
+        );
       };
     </script>
   </body>
