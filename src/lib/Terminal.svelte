@@ -74,14 +74,18 @@
   let terminalElement: HTMLElement;
   let contentElement: HTMLElement;
   
+  // Internal state for theme and tabs that can be controlled independently
+  let internalTheme = $state<Theme>(theme);
+  let internalTabs = $state<TabConfig[]>(tabs);
+  
   // Tab state management
   let currentTabIndex = $state(activeTab || 0);
   let tabStates = $state(new Map<string, TabState>());
   
   // Get current tab configuration
   let currentTab = $derived(
-    showTabs && tabs && tabs.length > 0 
-      ? tabs[currentTabIndex] || tabs[0]
+    showTabs && internalTabs && internalTabs.length > 0 
+      ? internalTabs[currentTabIndex] || internalTabs[0]
       : null
   );
   
@@ -166,6 +170,7 @@
   let typedContent = $state('');
   let hasAutoPlayed = $state(false);
   let isVisible = $state(false);
+  let isWindowFocused = $state(true);
   let previousAutoplay = $state(autoplay);
   
   // Non-reactive variables for internal tracking
@@ -176,8 +181,17 @@
   
   // Derived value for theme (pure computation, no side effects)
   let currentTheme = $derived(
-    mergeColors(theme === 'dark' ? darkTheme : lightTheme, colors)
+    mergeColors(internalTheme === 'dark' ? darkTheme : lightTheme, colors)
   );
+  
+  // Sync internal state with props when props change externally
+  $effect(() => {
+    internalTheme = theme;
+  });
+  
+  $effect(() => {
+    internalTabs = tabs;
+  });
 
   // Pure effect: Apply theme to DOM only (no state changes)
   $effect(() => {
@@ -219,9 +233,23 @@
     const delay = (step.delay || 1000) / playbackSpeed;
 
     playbackTimer = setTimeout(() => {
-      if (!currentSession) {
-        isPlaying = false;
-        playbackTimer = null;
+      if (!currentSession || !isWindowFocused) {
+        // If window lost focus, pause the timer but don't reset state
+        if (!isWindowFocused && isPlaying) {
+          playbackTimer = null;
+          // Re-schedule when window regains focus
+          const checkFocus = () => {
+            if (isWindowFocused && isPlaying) {
+              playNextStep();
+            } else if (isPlaying) {
+              setTimeout(checkFocus, 100);
+            }
+          };
+          setTimeout(checkFocus, 100);
+        } else {
+          isPlaying = false;
+          playbackTimer = null;
+        }
         return;
       }
       
@@ -266,6 +294,20 @@
         typingTimer = null;
         typingStepIndex = -1;
         typedContent = '';
+        return;
+      }
+      
+      if (!isWindowFocused) {
+        // Pause typing animation, but don't reset state
+        typingTimer = null;
+        const checkFocus = () => {
+          if (isWindowFocused && isPlaying && typingStepIndex >= 0) {
+            typeChar();
+          } else if (isPlaying && typingStepIndex >= 0) {
+            setTimeout(checkFocus, 100);
+          }
+        };
+        setTimeout(checkFocus, 100);
         return;
       }
       
@@ -483,14 +525,13 @@
   }
 
   // Use $effect instead of onMount to avoid lifecycle issues in web components
-  let observer: IntersectionObserver | null = null;
   let interval: ReturnType<typeof setInterval> | null = null;
   
   // Effect 1: Set up IntersectionObserver to track visibility only
   $effect(() => {
     if (terminalElement && typeof IntersectionObserver !== 'undefined') {
       // Always create a new observer when terminal element changes
-      const newObserver = new IntersectionObserver(
+      const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             isVisible = entry.isIntersecting;
@@ -499,17 +540,39 @@
         { threshold: 0.1 } // Trigger when 10% visible
       );
       
-      newObserver.observe(terminalElement);
-      observer = newObserver;
+      observer.observe(terminalElement);
       
       // Cleanup
       return () => {
-        if (newObserver) {
-          newObserver.disconnect();
+        if (observer) {
+          observer.disconnect();
         }
-        observer = null;
       };
     }
+  });
+  
+  // Effect 1.5: Set up window focus tracking
+  $effect(() => {
+    const handleFocus = () => {
+      isWindowFocused = true;
+    };
+    
+    const handleBlur = () => {
+      isWindowFocused = false;
+    };
+    
+    // Set initial state
+    isWindowFocused = document.hasFocus();
+    
+    // Add event listeners
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
   });
   
   // Effect 2: Handle autoplay changes - reset hasAutoPlayed when autoplay changes from false to true
@@ -543,8 +606,8 @@
   $effect(() => {
     if (terminalElement) {
       // Initialize first tab if tabs are provided
-      if (showTabs && tabs && tabs.length > 0) {
-        const firstTab = tabs[currentTabIndex] || tabs[0];
+      if (showTabs && internalTabs && internalTabs.length > 0) {
+        const firstTab = internalTabs[currentTabIndex] || internalTabs[0];
         if (firstTab) {
           lastTabId = firstTab.id;
         }
@@ -607,9 +670,11 @@
 
   // Handle theme toggle
   function toggleTheme() {
-    // This will trigger a prop update from the parent
-    // We don't modify theme directly, we emit an event
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    // Update internal theme state directly for immediate effect
+    const newTheme = internalTheme === 'dark' ? 'light' : 'dark';
+    internalTheme = newTheme;
+    
+    // Also emit event for external listeners
     terminalElement?.dispatchEvent(
       new CustomEvent('theme-change', { detail: newTheme })
     );
@@ -686,7 +751,7 @@
   }
   
   function switchTab(index: number) {
-    if (index === currentTabIndex || !tabs || index < 0 || index >= tabs.length) return;
+    if (index === currentTabIndex || !internalTabs || index < 0 || index >= internalTabs.length) return;
     
     // Save current tab state (including playback state)
     saveTabState();
@@ -703,7 +768,7 @@
     
     // Switch to new tab
     currentTabIndex = index;
-    const newTab = tabs[index];
+    const newTab = internalTabs[index];
     
     // Load new tab state
     if (newTab) {
@@ -718,9 +783,9 @@
   }
   
   function closeTab(index: number) {
-    if (!tabs || tabs.length <= 1) return;
+    if (!internalTabs || internalTabs.length === 0) return;
     
-    const tabToClose = tabs[index];
+    const tabToClose = internalTabs[index];
     const isClosable = tabToClose.closable !== false && allowTabClose;
     
     if (!isClosable) return;
@@ -730,19 +795,35 @@
       tabStates.delete(tabToClose.id);
     }
     
-    // Emit tab close event
+    // Determine if we're closing the currently active tab
+    const isClosingActiveTab = index === currentTabIndex;
+    
+    // Update internal tabs state - actually remove the tab
+    internalTabs = internalTabs.filter((_, i) => i !== index);
+    
+    // Emit tab close event for external listeners
     terminalElement?.dispatchEvent(
       new CustomEvent('tab-close', { detail: { index, tab: tabToClose } })
     );
     
-    // If closing current tab, switch to another
-    if (index === currentTabIndex) {
-      const newIndex = index > 0 ? index - 1 : 0;
-      if (tabs.length > 1) {
+    // Handle tab switching after closing
+    if (isClosingActiveTab) {
+      if (internalTabs.length > 0) {
+        // Determine new active tab index
+        const newIndex = index >= internalTabs.length ? internalTabs.length - 1 : index;
+        
+        // Force a proper tab switch to load the new tab's content
+        currentTabIndex = -1; // Temporarily set to invalid index to force switchTab to work
         switchTab(newIndex);
+      } else {
+        // No tabs left - reset to non-tab mode
+        currentTabIndex = 0;
+        resetPlayback();
+        // Clear any existing content since no tabs remain
+        displayedSteps = [];
       }
     } else if (index < currentTabIndex) {
-      // Adjust current index if a tab before current was closed
+      // Adjust current index if a tab before current was closed (but don't switch content)
       currentTabIndex--;
     }
   }
@@ -798,7 +879,7 @@
               class="control-button" 
               onclick={toggleTheme}
             >
-              {theme === 'dark' ? '☀' : '🌙'}
+              {internalTheme === 'dark' ? '☀' : '🌙'}
             </button>
           {/if}
         </div>
@@ -806,9 +887,9 @@
     </div>
   {/if}
   
-  {#if showTabs && tabs && tabs.length > 0 && tabBarPosition === 'top'}
+  {#if showTabs && internalTabs && internalTabs.length > 0 && tabBarPosition === 'top'}
     <div class="terminal-tabs">
-      {#each tabs as tab, index}
+      {#each internalTabs as tab, index}
         <button 
           class="terminal-tab {index === currentTabIndex ? 'active' : ''} {getTabStatusClass(tab.status)}"
           onclick={() => switchTab(index)}
@@ -820,7 +901,7 @@
           {#if tab.badge !== undefined}
             <span class="tab-badge">{tab.badge}</span>
           {/if}
-          {#if (tab.closable !== false && allowTabClose) && tabs.length > 1}
+          {#if (tab.closable !== false && allowTabClose) && internalTabs.length > 1}
             <span 
               class="tab-close"
               role="button"
@@ -882,9 +963,9 @@
     {/if}
   </div>
   
-  {#if showTabs && tabs && tabs.length > 0 && tabBarPosition === 'bottom'}
+  {#if showTabs && internalTabs && internalTabs.length > 0 && tabBarPosition === 'bottom'}
     <div class="terminal-tabs terminal-tabs-bottom">
-      {#each tabs as tab, index}
+      {#each internalTabs as tab, index}
         <button 
           class="terminal-tab {index === currentTabIndex ? 'active' : ''} {getTabStatusClass(tab.status)}"
           onclick={() => switchTab(index)}
@@ -896,7 +977,7 @@
           {#if tab.badge !== undefined}
             <span class="tab-badge">{tab.badge}</span>
           {/if}
-          {#if (tab.closable !== false && allowTabClose) && tabs.length > 1}
+          {#if (tab.closable !== false && allowTabClose) && internalTabs.length > 1}
             <span 
               class="tab-close"
               role="button"
